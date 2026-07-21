@@ -128,7 +128,6 @@
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const classesProscritos = ['Necromante', 'Cavaleiro da Morte', 'Bruxo', 'Encantador', 'Ceifador'];
-        
         let membrosCache = [];
 
         async function carregarMembros() {
@@ -148,123 +147,55 @@
 
             statusEl.textContent = '';
             membrosCache = data || [];
-            
-            // Log para inspeção no F12 do navegador caso precise ver a estrutura exata
-            console.log("Dados carregados dos membros:", membrosCache);
-            
             renderizarTabela(membrosCache);
         }
 
-        // Função ultra sensível para detectar qualquer indicativo de "Não tenho"
+        // Verifica se o valor indica que não tem o item
         function ehNaoTenho(val) {
-            if (val === undefined || val === null) return false;
+            if (val === undefined || val === null) return true;
+            if (typeof val === 'boolean') return !val;
             
-            if (typeof val === 'boolean') {
-                return val === false;
+            const lower = String(val).toLowerCase().trim();
+            if (['nao tenho', 'não tenho', 'nao_tenho', 'false', '-', '', 'não', 'nao'].includes(lower)) {
+                return true;
             }
-            
-            if (typeof val === 'string') {
-                const lower = val.toLowerCase().trim();
-                if (['nao_tenho', 'nao tenho', 'não tenho', 'nao', 'false', 'none', 'null', '-'].includes(lower)) return true;
-            }
-            
-            if (typeof val === 'object' && val !== null) {
-                if (val.nao_tenho === true || val.naoTenho === true || val.ativo === false || val.equipado === false) return true;
-                for (let k in val) {
-                    if (ehNaoTenho(val[k])) return true;
-                }
-            }
-            
             return false;
         }
 
-        // Formata a ampliação ou exibe "Não tenho"
+        // Exibe exatamente o texto escolhido no select
         function formatarValorAmp(valor) {
-            if (valor === undefined || valor === null || valor === '' || valor === false) return '-';
-            if (ehNaoTenho(valor)) return 'Não tenho';
-            
-            if (typeof valor === 'object') {
-                const nivel = valor.amp !== undefined ? valor.amp : (valor.nivel !== undefined ? valor.nivel : (valor.valor !== undefined ? valor.valor : null));
-                if (ehNaoTenho(nivel)) return 'Não tenho';
-                if (nivel !== null && nivel !== '' && nivel !== undefined) {
-                    const num = Number(nivel);
-                    if (!isNaN(num)) return num > 0 ? `+${num}` : `+0`;
-                    return String(nivel);
-                }
-                return valor.equipado || valor.ativo ? 'Equipado' : '-';
-            }
-            
-            const num = Number(valor);
-            if (!isNaN(num)) {
-                return num > 0 ? `+${num}` : `+0`;
-            }
-            
-            return String(valor);
+            if (valor === undefined || valor === null || valor === '') return '-';
+            const str = String(valor).trim();
+            if (ehNaoTenho(str)) return 'Não tenho';
+            return str;
         }
 
-        // Busca o acessório verificando colunas diretas e também o objeto JSON
-        function pegarValorAcessorio(m, tipo, indexFallback) {
-            if (!m) return null;
-            
-            const chavesPossiveis = {
-                anel1: ['anel1', 'anel_1', 'ring1', 'ampAnel1', 'anel1_amp', 'anel1Estado', 'anel1_estado', 'anel-1', 'ring_1', 'anel'],
-                anel2: ['anel2', 'anel_2', 'ring2', 'ampAnel2', 'anel2_amp', 'anel2Estado', 'anel2_estado', 'anel-2', 'ring_2'],
-                brac1: ['brac1', 'brac_1', 'bracadeira1', 'bracelete1', 'ampBrac1', 'brac1_amp', 'brac1Estado', 'bracadeira_1', 'brac-1', 'bracadeira'],
-                brac2: ['brac2', 'brac_2', 'bracadeira2', 'bracelete2', 'ampBrac2', 'brac2_amp', 'brac2Estado', 'bracadeira_2', 'brac-2'],
-                amu:   ['amu', 'amuleto', 'amulet', 'ampAmu', 'ampAmuleto', 'amu_amp', 'amuEstado', 'amuleto_estado', 'amu-1', 'amuleto1'],
-                capa:  ['capa', 'cloak', 'ampCapa', 'capa_amp', 'capaEstado', 'capa_estado']
-            };
+        // Recupera o valor priorizando a coluna direta do banco
+        function pegarValorAcessorio(m, chaveAcessorio, indexFallback) {
+            if (!m) return 'Não tenho';
 
-            const lista = chavesPossiveis[tipo] || [tipo];
-
-            // 1. Tenta buscar diretamente nas colunas do registro do membro `m`
-            for (let chave of lista) {
-                if (m[chave] !== undefined && m[chave] !== null && m[chave] !== '') {
-                    return m[chave];
-                }
+            // 1. Prioriza a coluna direta da tabela (dados salvos pelo formulário atual)
+            if (m[chaveAcessorio] !== undefined && m[chaveAcessorio] !== null && m[chaveAcessorio] !== '' && String(m[chaveAcessorio]).trim() !== '') {
+                return m[chaveAcessorio];
             }
 
-            // 2. Tenta buscar dentro de `acessorios_estado` (se existir)
+            // 2. Fallback para JSON antigo caso exista
             let acc = m.acessorios_estado;
             if (typeof acc === 'string') {
-                try {
-                    acc = JSON.parse(acc);
-                } catch (e) {
-                    acc = {};
-                }
+                try { acc = JSON.parse(acc); } catch (e) { acc = {}; }
             }
-            
-            if (Array.isArray(acc)) {
-                if (acc[indexFallback] !== undefined) return acc[indexFallback];
-            } else if (acc && typeof acc === 'object') {
-                for (let chave of lista) {
-                    if (acc[chave] !== undefined && acc[chave] !== null && acc[chave] !== '') {
-                        return acc[chave];
-                    }
-                }
-                
-                // Fallback por ordem de valores do objeto
-                const valores = Object.values(acc);
-                if (valores[indexFallback] !== undefined && valores[indexFallback] !== null && valores[indexFallback] !== '') {
-                    return valores[indexFallback];
-                }
 
-                // Busca aproximada por texto na chave
-                for (let key in acc) {
-                    if (key.toLowerCase().includes(tipo.toLowerCase())) {
-                        return acc[key];
-                    }
+            if (acc && typeof acc === 'object' && !Array.isArray(acc)) {
+                if (acc[chaveAcessorio] !== undefined && acc[chaveAcessorio] !== null && acc[chaveAcessorio] !== '') {
+                    return acc[chaveAcessorio];
+                }
+            } else if (Array.isArray(acc)) {
+                if (acc[indexFallback] !== undefined && acc[indexFallback] !== null) {
+                    return acc[indexFallback];
                 }
             }
 
-            // 3. Varredura final por aproximação em todas as colunas de `m`
-            for (let key in m) {
-                if (key.toLowerCase().includes(tipo.toLowerCase()) && m[key] !== undefined && m[key] !== null && m[key] !== '') {
-                    return m[key];
-                }
-            }
-
-            return null;
+            return m[chaveAcessorio] || 'Não tenho';
         }
 
         function renderizarTabela(membros) {
@@ -294,7 +225,6 @@
                 const calor = formatarValorAmp(m.amp_calor);
                 const pvp   = formatarValorAmp(m.amp_pvp);
 
-                // Passa o membro inteiro e o índice correspondente
                 const vAnel1 = pegarValorAcessorio(m, 'anel1', 0);
                 const vAnel2 = pegarValorAcessorio(m, 'anel2', 1);
                 const vBrac1 = pegarValorAcessorio(m, 'brac1', 2);
@@ -316,15 +246,15 @@
                 tr.innerHTML = `
                     <td class="py-3 px-3 font-bold text-amber-200">${m.char_name || 'Desconhecido'}</td>
                     <td class="py-3 px-3 text-amber-400">${m.char_class || '-'}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_t5) ? 'text-red-400 font-bold' : 'text-amber-200'}">${t5}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_calor) ? 'text-red-400 font-bold' : 'text-amber-200'}">${calor}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_pvp) ? 'text-red-400 font-bold' : 'text-amber-200'}">${pvp}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel1) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${anel1}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel2) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${anel2}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac1) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${brac1}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac2) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${brac2}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAmu) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${amu}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vCapa) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${capa}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_t5) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${t5}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_calor) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${calor}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_pvp) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${pvp}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel1}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel2}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac1}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac2}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAmu) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${amu}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vCapa) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${capa}</td>
                     <td class="py-3 px-3 text-center text-amber-600">${dataFormatada}</td>
                     <td class="py-3 px-3 text-center">
                         <button onclick="excluirMembro('${m.id}')" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-2 py-1 rounded-lg text-xs transition cursor-pointer">
