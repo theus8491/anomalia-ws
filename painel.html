@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Adm - Guilda Anomalia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF para exportar relatório -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- jsPDF AutoTable Plugin (Para tabelas no PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0d0b09;
+            color: #abdcb2;
+            background-image: 
+                radial-gradient(circle at 50% 10%, #291c13 0%, #0d0b09 60%),
+                linear-gradient(to bottom, rgba(13, 11, 9, 0.95), rgba(7, 5, 4, 0.98));
+            background-attachment: fixed;
+        }
+        h1, h2, h3, .font-rpg {
+            font-family: 'Cinzel', serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white p-4">
+
+    <main class="w-full max-w-7xl mx-auto space-y-6 my-auto">
+        
+        <!-- HEADER DO PAINEL -->
+        <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-400 border border-amber-800/50 mb-1">
+                    <i class="fa-solid fa-lock-open"></i> Área Administrativa
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-black text-amber-100 font-rpg">Painel de Gerenciamento</h1>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="carregarMembros()" class="flex items-center gap-2 bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-4 py-2.5 rounded-xl text-amber-300 text-xs font-bold font-rpg transition cursor-pointer">
+                    <i class="fa-solid fa-rotate"></i> Atualizar
+                </button>
+                <button onclick="gerarPDF()" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-stone-950 px-4 py-2.5 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg">
+                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+                </button>
+                <a href="index.html" class="flex items-center gap-2 bg-red-950/60 hover:bg-red-900/60 border border-red-800/50 px-4 py-2.5 rounded-xl text-red-300 text-xs font-bold font-rpg transition">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
+                </a>
+            </div>
+        </header>
+
+        <!-- ESTATÍSTICAS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Total de Membros</div>
+                    <div id="totalMembros" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
+                </div>
+                <i class="fa-solid fa-users text-2xl text-amber-600/50"></i>
+            </div>
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Clãs / Segunda Facção</div>
+                    <div id="totalClas" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
+                </div>
+                <i class="fa-solid fa-shield text-2xl text-amber-600/50"></i>
+            </div>
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Proscritos</div>
+                    <div id="totalProscritos" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
+                </div>
+                <i class="fa-solid fa-skull text-2xl text-amber-600/50"></i>
+            </div>
+        </div>
+
+        <!-- TABELA DE REGISTROS -->
+        <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-6 shadow-xl overflow-hidden space-y-4">
+            <h2 class="text-lg font-bold text-amber-200 font-rpg">Heróis Cadastrados</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-[#352214] text-amber-500 font-rpg">
+                            <th class="py-3 px-3">Personagem</th>
+                            <th class="py-3 px-3">Classe</th>
+                            <th class="py-3 px-3 text-center">T5</th>
+                            <th class="py-3 px-3 text-center">Map 5</th>
+                            <th class="py-3 px-3 text-center">PvP</th>
+                            <th class="py-3 px-3 text-center">Anel 1</th>
+                            <th class="py-3 px-3 text-center">Anel 2</th>
+                            <th class="py-3 px-3 text-center">Brac 1</th>
+                            <th class="py-3 px-3 text-center">Brac 2</th>
+                            <th class="py-3 px-3 text-center">Amulet</th>
+                            <th class="py-3 px-3 text-center">Capa</th>
+                            <th class="py-3 px-3 text-center">Data</th>
+                            <th class="py-3 px-3 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaMembros" class="divide-y divide-[#291c13] text-amber-100">
+                        <tr>
+                            <td colspan="13" class="py-6 text-center text-amber-600 italic">Carregando heróis da guilda...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="statusMensagem" class="text-center text-xs text-amber-500 font-rpg pt-2"></div>
+        </section>
+
+    </main>
+
+    <footer class="w-full text-center py-6 text-xs text-amber-700/60 font-rpg tracking-wider">
+        GUILDA ANOMALIA &copy; 2026
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://krabfzjnejvpatufolma.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_VIh6KfT200rJ28XySTS71g_w0tIO4s5';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const classesProscritos = ['Necromante', 'Cavaleiro da Morte', 'Bruxo', 'Encantador', 'Ceifador'];
+        
+        let membrosCache = [];
+
+        async function carregarMembros() {
+            const statusEl = document.getElementById('statusMensagem');
+            statusEl.textContent = 'Buscando dados no Supabase...';
+
+            const { data, error } = await _supabase
+                .from('membros')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Erro ao carregar do Supabase:", error.message);
+                statusEl.textContent = 'Erro ao carregar: ' + error.message;
+                return;
+            }
+
+            statusEl.textContent = '';
+            membrosCache = data || [];
+            
+            // Log para inspeção no F12 do navegador caso precise ver a estrutura exata
+            console.log("Dados carregados dos membros:", membrosCache);
+            
+            renderizarTabela(membrosCache);
+        }
+
+        // Função ultra sensível para detectar qualquer indicativo de "Não tenho"
+        function ehNaoTenho(val) {
+            if (val === undefined || val === null) return false;
+            
+            if (typeof val === 'boolean') {
+                return val === false;
+            }
+            
+            if (typeof val === 'string') {
+                const lower = val.toLowerCase().trim();
+                if (['nao_tenho', 'nao tenho', 'não tenho', 'nao', 'false', 'none', 'null', '-'].includes(lower)) return true;
+            }
+            
+            if (typeof val === 'object' && val !== null) {
+                if (val.nao_tenho === true || val.naoTenho === true || val.ativo === false || val.equipado === false) return true;
+                for (let k in val) {
+                    if (ehNaoTenho(val[k])) return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Formata a ampliação ou exibe "Não tenho"
+        function formatarValorAmp(valor) {
+            if (valor === undefined || valor === null || valor === '' || valor === false) return '-';
+            if (ehNaoTenho(valor)) return 'Não tenho';
+            
+            if (typeof valor === 'object') {
+                const nivel = valor.amp !== undefined ? valor.amp : (valor.nivel !== undefined ? valor.nivel : (valor.valor !== undefined ? valor.valor : null));
+                if (ehNaoTenho(nivel)) return 'Não tenho';
+                if (nivel !== null && nivel !== '' && nivel !== undefined) {
+                    const num = Number(nivel);
+                    if (!isNaN(num)) return num > 0 ? `+${num}` : `+0`;
+                    return String(nivel);
+                }
+                return valor.equipado || valor.ativo ? 'Equipado' : '-';
+            }
+            
+            const num = Number(valor);
+            if (!isNaN(num)) {
+                return num > 0 ? `+${num}` : `+0`;
+            }
+            
+            return String(valor);
+        }
+
+        // Busca o acessório verificando colunas diretas e também o objeto JSON
+        function pegarValorAcessorio(m, tipo, indexFallback) {
+            if (!m) return null;
+            
+            const chavesPossiveis = {
+                anel1: ['anel1', 'anel_1', 'ring1', 'ampAnel1', 'anel1_amp', 'anel1Estado', 'anel1_estado', 'anel-1', 'ring_1', 'anel'],
+                anel2: ['anel2', 'anel_2', 'ring2', 'ampAnel2', 'anel2_amp', 'anel2Estado', 'anel2_estado', 'anel-2', 'ring_2'],
+                brac1: ['brac1', 'brac_1', 'bracadeira1', 'bracelete1', 'ampBrac1', 'brac1_amp', 'brac1Estado', 'bracadeira_1', 'brac-1', 'bracadeira'],
+                brac2: ['brac2', 'brac_2', 'bracadeira2', 'bracelete2', 'ampBrac2', 'brac2_amp', 'brac2Estado', 'bracadeira_2', 'brac-2'],
+                amu:   ['amu', 'amuleto', 'amulet', 'ampAmu', 'ampAmuleto', 'amu_amp', 'amuEstado', 'amuleto_estado', 'amu-1', 'amuleto1'],
+                capa:  ['capa', 'cloak', 'ampCapa', 'capa_amp', 'capaEstado', 'capa_estado']
+            };
+
+            const lista = chavesPossiveis[tipo] || [tipo];
+
+            // 1. Tenta buscar diretamente nas colunas do registro do membro `m`
+            for (let chave of lista) {
+                if (m[chave] !== undefined && m[chave] !== null && m[chave] !== '') {
+                    return m[chave];
+                }
+            }
+
+            // 2. Tenta buscar dentro de `acessorios_estado` (se existir)
+            let acc = m.acessorios_estado;
+            if (typeof acc === 'string') {
+                try {
+                    acc = JSON.parse(acc);
+                } catch (e) {
+                    acc = {};
+                }
+            }
+            
+            if (Array.isArray(acc)) {
+                if (acc[indexFallback] !== undefined) return acc[indexFallback];
+            } else if (acc && typeof acc === 'object') {
+                for (let chave of lista) {
+                    if (acc[chave] !== undefined && acc[chave] !== null && acc[chave] !== '') {
+                        return acc[chave];
+                    }
+                }
+                
+                // Fallback por ordem de valores do objeto
+                const valores = Object.values(acc);
+                if (valores[indexFallback] !== undefined && valores[indexFallback] !== null && valores[indexFallback] !== '') {
+                    return valores[indexFallback];
+                }
+
+                // Busca aproximada por texto na chave
+                for (let key in acc) {
+                    if (key.toLowerCase().includes(tipo.toLowerCase())) {
+                        return acc[key];
+                    }
+                }
+            }
+
+            // 3. Varredura final por aproximação em todas as colunas de `m`
+            for (let key in m) {
+                if (key.toLowerCase().includes(tipo.toLowerCase()) && m[key] !== undefined && m[key] !== null && m[key] !== '') {
+                    return m[key];
+                }
+            }
+
+            return null;
+        }
+
+        function renderizarTabela(membros) {
+            const tbody = document.getElementById('tabelaMembros');
+            tbody.innerHTML = '';
+
+            document.getElementById('totalMembros').textContent = membros.length;
+            
+            let clasCount = 0;
+            let proscritosCount = 0;
+
+            if (membros.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="py-6 text-center text-amber-600 italic">Nenhum herói cadastrado ainda.</td></tr>`;
+                document.getElementById('totalClas').textContent = 0;
+                document.getElementById('totalProscritos').textContent = 0;
+                return;
+            }
+
+            membros.forEach(m => {
+                if (classesProscritos.includes(m.char_class)) {
+                    proscritosCount++;
+                } else {
+                    clasCount++;
+                }
+
+                const t5    = formatarValorAmp(m.amp_t5);
+                const calor = formatarValorAmp(m.amp_calor);
+                const pvp   = formatarValorAmp(m.amp_pvp);
+
+                // Passa o membro inteiro e o índice correspondente
+                const vAnel1 = pegarValorAcessorio(m, 'anel1', 0);
+                const vAnel2 = pegarValorAcessorio(m, 'anel2', 1);
+                const vBrac1 = pegarValorAcessorio(m, 'brac1', 2);
+                const vBrac2 = pegarValorAcessorio(m, 'brac2', 3);
+                const vAmu   = pegarValorAcessorio(m, 'amu', 4);
+                const vCapa  = pegarValorAcessorio(m, 'capa', 5);
+
+                const anel1 = formatarValorAmp(vAnel1);
+                const anel2 = formatarValorAmp(vAnel2);
+                const brac1 = formatarValorAmp(vBrac1);
+                const brac2 = formatarValorAmp(vBrac2);
+                const amu   = formatarValorAmp(vAmu);
+                const capa  = formatarValorAmp(vCapa);
+
+                const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-[#201813] transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-bold text-amber-200">${m.char_name || 'Desconhecido'}</td>
+                    <td class="py-3 px-3 text-amber-400">${m.char_class || '-'}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_t5) ? 'text-red-400 font-bold' : 'text-amber-200'}">${t5}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_calor) ? 'text-red-400 font-bold' : 'text-amber-200'}">${calor}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_pvp) ? 'text-red-400 font-bold' : 'text-amber-200'}">${pvp}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel1) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${anel1}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel2) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${anel2}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac1) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${brac1}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac2) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${brac2}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAmu) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${amu}</td>
+                    <td class="py-3 px-3 text-center ${ehNaoTenho(vCapa) ? 'text-red-400 font-bold' : 'text-emerald-400'}">${capa}</td>
+                    <td class="py-3 px-3 text-center text-amber-600">${dataFormatada}</td>
+                    <td class="py-3 px-3 text-center">
+                        <button onclick="excluirMembro('${m.id}')" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-2 py-1 rounded-lg text-xs transition cursor-pointer">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalClas').textContent = clasCount;
+            document.getElementById('totalProscritos').textContent = proscritosCount;
+        }
+
+        async function excluirMembro(id) {
+            if (!confirm('Tem certeza que deseja remover este herói da guilda?')) return;
+
+            const { error } = await _supabase.from('membros').delete().eq('id', id);
+            if (error) {
+                alert('Erro ao excluir: ' + error.message);
+            } else {
+                carregarMembros();
+            }
+        }
+
+        function gerarPDF() {
+            if (membrosCache.length === 0) {
+                alert('Não há dados cadastrados para exportar no PDF.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape' });
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(99, 69, 44);
+            doc.text("Relatório Completo de Membros e Equipamentos - Guilda Anomalia", 14, 15);
+
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            const totalMembros = membrosCache.length;
+            let totalProscritos = membrosCache.filter(m => classesProscritos.includes(m.char_class)).length;
+            let totalClas = totalMembros - totalProscritos;
+
+            doc.text(`Data de Emissão: ${dataAtual} | Total de Membros: ${totalMembros} (Clãs: ${totalClas} | Proscritos: ${totalProscritos})`, 14, 22);
+
+            const tableRows = membrosCache.map(m => {
+                const t5Val    = formatarValorAmp(m.amp_t5);
+                const calorVal = formatarValorAmp(m.amp_calor);
+                const pvpVal   = formatarValorAmp(m.amp_pvp);
+
+                const anel1 = formatarValorAmp(pegarValorAcessorio(m, 'anel1', 0));
+                const anel2 = formatarValorAmp(pegarValorAcessorio(m, 'anel2', 1));
+                const brac1 = formatarValorAmp(pegarValorAcessorio(m, 'brac1', 2));
+                const brac2 = formatarValorAmp(pegarValorAcessorio(m, 'brac2', 3));
+                const amu   = formatarValorAmp(pegarValorAcessorio(m, 'amu', 4));
+                const capa  = formatarValorAmp(pegarValorAcessorio(m, 'capa', 5));
+
+                const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
+                
+                return [
+                    m.char_name || '-',
+                    m.char_class || '-',
+                    t5Val,
+                    calorVal,
+                    pvpVal,
+                    anel1,
+                    anel2,
+                    brac1,
+                    brac2,
+                    amu,
+                    capa,
+                    dataFormatada
+                ];
+            });
+
+            doc.autoTable({
+                startY: 28,
+                head: [['Personagem', 'Classe', 'T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amulet', 'Capa', 'Data']],
+                body: tableRows,
+                headStyles: {
+                    fillColor: [41, 28, 19],
+                    textColor: [212, 175, 55],
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                bodyStyles: {
+                    textColor: [50, 50, 50],
+                    fontSize: 8,
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { halign: 'left', fontStyle: 'bold' },
+                    1: { halign: 'left' }
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 240, 235]
+                },
+                margin: { horizontal: 14 }
+            });
+
+            doc.save("relatorio-completo-equipamentos-anomalia.pdf");
+        }
+
+        carregarMembros();
+    </script>
+</body>
+</html>

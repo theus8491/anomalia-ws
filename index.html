@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guilda Anomalia - BR-Tourmaline</title>
+    <!-- Tailwind CSS (Play CDN com suporte a customização) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel (RPG/Medieval) & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0d0b09;
+            color: #abdcb2;
+            background-image: 
+                radial-gradient(circle at 50% 10%, #291c13 0%, #0d0b09 60%),
+                linear-gradient(to bottom, rgba(13, 11, 9, 0.95), rgba(7, 5, 4, 0.98));
+            background-attachment: fixed;
+        }
+        h1, h2, h3, .font-rpg {
+            font-family: 'Cinzel', serif;
+        }
+        select option {
+            background-color: #1a1410;
+            color: #abdcb2;
+        }
+        .custom-checkbox {
+            accent-color: #d97706;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white">
+
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[350px] bg-[radial-gradient(#422b17_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
+    </div>
+
+    <main class="w-full max-w-4xl mx-auto my-auto relative z-10 space-y-6 p-4">
+        
+        <!-- HEADER DA GUILDA -->
+        <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-48 h-48 bg-amber-600/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="space-y-1 text-center sm:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Servidor Oficial: BR-Tourmaline
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-amber-100 font-rpg tracking-wide drop-shadow-md">
+                        Guilda Anomalia
+                    </h1>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="login.html" class="flex items-center gap-2 bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-4 py-2.5 rounded-xl shadow-lg transition text-amber-300 hover:text-amber-100 text-xs font-bold font-rpg tracking-wider">
+                        <i class="fa-solid fa-lock text-amber-500"></i> Painel Adm
+                    </a>
+
+                    <div class="flex items-center gap-3 bg-[#130f0d] border border-[#422b17] px-4 py-2.5 rounded-xl shadow-inner">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-shield-halved text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] uppercase tracking-wider text-amber-500/80 font-bold">Banco de Dados</div>
+                            <div class="text-xs font-semibold text-emerald-400">Supabase Conectado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- FORMULÁRIO -->
+        <form id="itemForm" class="space-y-6">
+
+            <!-- SEÇÃO I -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]">
+                    <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">I</span>
+                    <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">IDENTIDADE DO HERÓI</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="charName" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5">Nome do Personagem</label>
+                        <input type="text" id="charName" placeholder="Ex: AnomallaMaster" required
+                            class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 placeholder:text-amber-700/50 focus:outline-none focus:border-amber-600 text-sm">
+                    </div>
+
+                    <div>
+                        <label for="charClass" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5">Classe</label>
+                        <select id="charClass" required
+                            class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm">
+                            <option value="" disabled selected>Selecione sua classe</option>
+                            <optgroup label="Segunda Facção / Tribos e Legião">
+                                <option value="Bárbaro">Bárbaro</option>
+                                <option value="Ladino">Ladino</option>
+                                <option value="Xamã">Xamã</option>
+                                <option value="Caçador">Caçador</option>
+                                <option value="Cacique">Cacique</option>
+                            </optgroup>
+                            <optgroup label="Proscritos">
+                                <option value="Necromante">Necromante</option>
+                                <option value="Cavaleiro da Morte">Cavaleiro da Morte</option>
+                                <option value="Bruxo">Bruxo</option>
+                                <option value="Encantador">Encantador</option>
+                                <option value="Ceifador">Ceifador</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO II -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]">
+                    <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">II</span>
+                    <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">AMPLIFICAÇÃO DAS ARMAS (1 A 10 ESTRELAS)</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Arma T5 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma T5</div>
+                                <div class="text-xs text-amber-600 font-medium">Fúria das Profundezas</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noT5" class="custom-checkbox" onchange="toggleWeapon('T5')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkT5" class="custom-checkbox"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampT5" onchange="updateStars('ampT5', 'starsT5')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsT5" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Arma Map 5 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma Map 5</div>
+                                <div class="text-xs text-amber-600 font-medium">Calor Exclusivo</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noCalor" class="custom-checkbox" onchange="toggleWeapon('Calor')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkCalor" class="custom-checkbox"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampCalor" onchange="updateStars('ampCalor', 'starsCalor')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsCalor" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Arma PvP -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma PvP</div>
+                                <div class="text-xs text-amber-600 font-medium">Equipamento de Arena</div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noPvp" class="custom-checkbox" onchange="toggleWeapon('Pvp')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkPvp" class="custom-checkbox"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampPvp" onchange="updateStars('ampPvp', 'starsPvp')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsPvp" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO III -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-[#352214]">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">III</span>
+                        <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">ACESSÓRIOS PVP & AMPLIFICAÇÃO</h2>
+                    </div>
+                    <div id="equippedCounter" class="text-xs font-semibold bg-[#110e0c] border border-[#422b17] px-3 py-1 rounded-full text-amber-500">
+                        0 / 6 Equipados
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Anel 1 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Anel 1</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noAnel1" class="custom-checkbox" onchange="toggleAccessory('Anel1')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkAnel1" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampAnel1" onchange="updateStars('ampAnel1', 'starsAnel1')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsAnel1" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Anel 2 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Anel 2</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noAnel2" class="custom-checkbox" onchange="toggleAccessory('Anel2')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkAnel2" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampAnel2" onchange="updateStars('ampAnel2', 'starsAnel2')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsAnel2" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Bracelete 1 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Bracelete 1</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noBracelete1" class="custom-checkbox" onchange="toggleAccessory('Bracelete1')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkBracelete1" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampBracelete1" onchange="updateStars('ampBracelete1', 'starsBracelete1')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsBracelete1" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Bracelete 2 -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Bracelete 2</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noBracelete2" class="custom-checkbox" onchange="toggleAccessory('Bracelete2')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkBracelete2" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampBracelete2" onchange="updateStars('ampBracelete2', 'starsBracelete2')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsBracelete2" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Amuleto -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Amuleto</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noAmuleto" class="custom-checkbox" onchange="toggleAccessory('Amuleto')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkAmuleto" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampAmuleto" onchange="updateStars('ampAmuleto', 'starsAmuleto')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsAmuleto" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+
+                    <!-- Capa -->
+                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-amber-100 font-rpg">Capa</span>
+                            <div class="flex items-center gap-3">
+                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
+                                    <input type="checkbox" id="noCapa" class="custom-checkbox" onchange="toggleAccessory('Capa')"> Não tenho
+                                </label>
+                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
+                                    <input type="checkbox" id="checkCapa" class="custom-checkbox" onchange="updateCounter()"> Equipado
+                                </label>
+                            </div>
+                        </div>
+                        <select id="ampCapa" onchange="updateStars('ampCapa', 'starsCapa')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
+                            <option value="0">+0 (Sem amp)</option>
+                            <option value="1">+1 Estrela</option><option value="2">+2 Estrelas</option><option value="3">+3 Estrelas</option><option value="4">+4 Estrelas</option><option value="5">+5 Estrelas</option><option value="6">+6 Estrelas</option><option value="7">+7 Estrelas</option><option value="8">+8 Estrelas</option><option value="9">+9 Estrelas</option><option value="10">+10 Estrelas</option>
+                        </select>
+                        <div id="starsCapa" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-xl font-rpg tracking-wider text-sm sm:text-base border border-amber-400 cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> ENVIAR CREDENCIAIS PARA A GUILDA
+            </button>
+        </form>
+    </main>
+
+    <footer class="w-full text-center py-6 text-xs text-amber-700/60 font-rpg tracking-wider relative z-10">
+        GUILDA ANOMALIA &copy; 2026
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://krabfzjnejvpatufolma.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_VIh6KfT200rJ28XySTS71g_w0tIO4s5';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function updateStars(selectId, starsId) {
+            const selectElement = document.getElementById(selectId);
+            const starsContainer = document.getElementById(starsId);
+            const value = parseInt(selectElement.value);
+
+            let starsHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                if (i <= value) {
+                    starsHTML += '<span class="text-amber-400 drop-shadow-[0_0_4px_rgba(251,191,36,0.6)]">★</span>';
+                } else {
+                    starsHTML += '<span class="text-amber-700/30">★</span>';
+                }
+            }
+            starsContainer.innerHTML = starsHTML;
+        }
+
+        // Função para desativar/ativar o seletor quando marcar "Não tenho" nas Armas
+        function toggleWeapon(name) {
+            const noCheck = document.getElementById('no' + name);
+            const equippedCheck = document.getElementById('check' + name);
+            const selectElem = document.getElementById('amp' + name);
+            const starsElem = document.getElementById('stars' + name);
+
+            if (noCheck.checked) {
+                equippedCheck.checked = false;
+                equippedCheck.disabled = true;
+                selectElem.value = "0";
+                selectElem.disabled = true;
+                selectElem.classList.add('opacity-40', 'cursor-not-allowed');
+                starsElem.style.opacity = '0.3';
+                updateStars('amp' + name, 'stars' + name);
+            } else {
+                equippedCheck.disabled = false;
+                selectElem.disabled = false;
+                selectElem.classList.remove('opacity-40', 'cursor-not-allowed');
+                starsElem.style.opacity = '1';
+            }
+        }
+
+        // Função para desativar/ativar o seletor quando marcar "Não tenho" nos Acessórios
+        function toggleAccessory(name) {
+            const noCheck = document.getElementById('no' + name);
+            const equippedCheck = document.getElementById('check' + name);
+            const selectElem = document.getElementById('amp' + name);
+            const starsElem = document.getElementById('stars' + name);
+
+            if (noCheck.checked) {
+                equippedCheck.checked = false;
+                equippedCheck.disabled = true;
+                selectElem.value = "0";
+                selectElem.disabled = true;
+                selectElem.classList.add('opacity-40', 'cursor-not-allowed');
+                starsElem.style.opacity = '0.3';
+                updateStars('amp' + name, 'stars' + name);
+            } else {
+                equippedCheck.disabled = false;
+                selectElem.disabled = false;
+                selectElem.classList.remove('opacity-40', 'cursor-not-allowed');
+                starsElem.style.opacity = '1';
+            }
+            updateCounter();
+        }
+
+        function updateCounter() {
+            const checkboxes = ['checkAnel1', 'checkAnel2', 'checkBracelete1', 'checkBracelete2', 'checkAmuleto', 'checkCapa'];
+            let count = 0;
+            checkboxes.forEach(id => {
+                if (document.getElementById(id).checked) count++;
+            });
+            document.getElementById('equippedCounter').textContent = `${count} / 6 Equipados`;
+        }
+
+        document.getElementById('itemForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const charName = document.getElementById('charName').value;
+            const charClass = document.getElementById('charClass').value;
+
+            // Coleta dados das armas (se marcou "Não tenho" salva 'nao_tenho', senão o valor numérico da amp)
+            const getWeaponData = (name) => {
+                const isNo = document.getElementById('no' + name).checked;
+                if (isNo) return 'nao_tenho';
+                return parseInt(document.getElementById('amp' + name).value);
+            };
+
+            const ampT5 = getWeaponData('T5');
+            const ampCalor = getWeaponData('Calor');
+            const ampPvp = getWeaponData('Pvp');
+
+            // Coleta se tem ou não o acessório, e envia 'nao_tenho' ou o valor da amp
+            const getAccessoryData = (name) => {
+                const isNo = document.getElementById('no' + name).checked;
+                if (isNo) return 'nao_tenho';
+                return parseInt(document.getElementById('amp' + name).value);
+            };
+
+            const acessoriosEstado = {
+                anel1: document.getElementById('checkAnel1').checked,
+                anel2: document.getElementById('checkAnel2').checked,
+                brac1: document.getElementById('checkBracelete1').checked,
+                brac2: document.getElementById('checkBracelete2').checked,
+                amu: document.getElementById('checkAmuleto').checked,
+                capa: document.getElementById('checkCapa').checked,
+                
+                noAnel1: document.getElementById('noAnel1').checked,
+                noAnel2: document.getElementById('noAnel2').checked,
+                noBrac1: document.getElementById('noBracelete1').checked,
+                noBrac2: document.getElementById('noBracelete2').checked,
+                noAmu: document.getElementById('noAmuleto').checked,
+                noCapa: document.getElementById('noCapa').checked,
+
+                ampAnel1: getAccessoryData('Anel1'),
+                ampAnel2: getAccessoryData('Anel2'),
+                ampBrac1: getAccessoryData('Bracelete1'),
+                ampBrac2: getAccessoryData('Bracelete2'),
+                ampAmu: getAccessoryData('Amuleto'),
+                ampCapa: getAccessoryData('Capa')
+            };
+
+            // Você também pode enviar o estado das armas se quiser salvar quais estão equipadas no banco
+            const armasEstado = {
+                eqT5: document.getElementById('checkT5').checked,
+                eqCalor: document.getElementById('checkCalor').checked,
+                eqPvp: document.getElementById('checkPvp').checked,
+                noT5: document.getElementById('noT5').checked,
+                noCalor: document.getElementById('noCalor').checked,
+                noPvp: document.getElementById('noPvp').checked
+            };
+
+            const { data, error } = await _supabase
+                .from('membros')
+                .insert([{ 
+                    char_name: charName, 
+                    char_class: charClass, 
+                    amp_t5: ampT5, 
+                    amp_calor: ampCalor, 
+                    amp_pvp: ampPvp, 
+                    acessorios_estado: acessoriosEstado 
+                }])
+                .select();
+
+            if (error) {
+                console.error("Erro do Supabase:", error.message);
+                alert('Erro ao enviar dados para a guilda: ' + error.message);
+            } else {
+                alert(`Credenciais e equipamentos de ${charName} (${charClass}) enviados com sucesso!`);
+                document.getElementById('itemForm').reset();
+                
+                // Reseta os estados visuais dos selects de Armas
+                ['T5', 'Calor', 'Pvp'].forEach(name => {
+                    const selectElem = document.getElementById('amp' + name);
+                    const equippedElem = document.getElementById('check' + name);
+                    const starsElem = document.getElementById('stars' + name);
+                    selectElem.disabled = false;
+                    selectElem.classList.remove('opacity-40', 'cursor-not-allowed');
+                    equippedElem.disabled = false;
+                    starsElem.style.opacity = '1';
+                    updateStars('amp' + name, 'stars' + name);
+                });
+
+                // Reseta os estados visuais dos selects de Acessórios
+                ['Anel1', 'Anel2', 'Bracelete1', 'Bracelete2', 'Amuleto', 'Capa'].forEach(name => {
+                    const selectElem = document.getElementById('amp' + name);
+                    const equippedElem = document.getElementById('check' + name);
+                    const starsElem = document.getElementById('stars' + name);
+                    selectElem.disabled = false;
+                    selectElem.classList.remove('opacity-40', 'cursor-not-allowed');
+                    equippedElem.disabled = false;
+                    starsElem.style.opacity = '1';
+                    updateStars('amp' + name, 'stars' + name);
+                });
+
+                updateCounter();
+            }
+        });
+    </script>
+</body>
+</html>
