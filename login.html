@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -62,7 +61,10 @@
                         <i class="fa-solid fa-lock"></i>
                     </span>
                     <input type="password" id="senha" required placeholder="••••••••" 
-                        class="w-full bg-[#130f0d] border border-[#422b17] rounded-xl py-2.5 pl-10 pr-4 text-xs text-amber-100 placeholder-amber-800 focus:outline-none focus:border-amber-600 transition">
+                        class="w-full bg-[#130f0d] border border-[#422b17] rounded-xl py-2.5 pl-10 pr-10 text-xs text-amber-100 placeholder-amber-800 focus:outline-none focus:border-amber-600 transition">
+                    <button type="button" onclick="toggleSenha()" class="absolute inset-y-0 right-0 flex items-center pr-3 text-amber-700 hover:text-amber-400 cursor-pointer">
+                        <i id="iconeOlho" class="fa-solid fa-eye"></i>
+                    </button>
                 </div>
             </div>
 
@@ -96,6 +98,25 @@
         const form = document.getElementById('loginForm');
         const mensagemStatus = document.getElementById('mensagemStatus');
         const btnEntrar = document.getElementById('btnEntrar');
+
+        // Limpa qualquer sessão anterior ao abrir a página para exigir login do zero sempre
+        async function limparSessao() {
+            await _supabase.auth.signOut();
+        }
+        limparSessao();
+
+        // Função para alternar visibilidade da senha
+        function toggleSenha() {
+            const inputSenha = document.getElementById('senha');
+            const iconeOlho = document.getElementById('iconeOlho');
+            if (inputSenha.type === 'password') {
+                inputSenha.type = 'text';
+                iconeOlho.className = 'fa-solid fa-eye-slash';
+            } else {
+                inputSenha.type = 'password';
+                iconeOlho.className = 'fa-solid fa-eye';
+            }
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

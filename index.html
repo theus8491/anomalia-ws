@@ -4,96 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guilda Anomalia - BR-Tourmaline</title>
-    
-    <!-- Tailwind CSS (Play CDN com suporte a customização) -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Supabase Client CDN -->
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Cinzel (RPG/Medieval) & Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Link para o CSS Externo -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white">
-
-    <div class="fixed inset-0 pointer-events-none z-0">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[350px] bg-[radial-gradient(#422b17_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div>
-    </div>
-
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white bg-[#0c0907] text-[#f5f5f4]">
+    <div class="fixed inset-0 pointer-events-none z-0"><div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[350px] bg-[radial-gradient(#422b17_1px,transparent_1px)] [background-size:16px_16px] opacity-30"></div></div>
+    
     <main class="w-full max-w-4xl mx-auto my-auto relative z-10 space-y-6 p-4">
         
-        <!-- HEADER DA GUILDA -->
+        <!-- HEADER -->
         <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-6 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-48 h-48 bg-amber-600/5 rounded-full blur-3xl pointer-events-none"></div>
-            
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="space-y-1 text-center sm:text-left">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Servidor Oficial: BR-Tourmaline
-                    </div>
-                    <h1 class="text-3xl sm:text-4xl font-black text-amber-100 font-rpg tracking-wide drop-shadow-md">
-                        Guilda Anomalia
-                    </h1>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/50"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Servidor Oficial: BR-Tourmaline</div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-amber-100 font-rpg tracking-wide drop-shadow-md">Guilda Anomalia</h1>
                 </div>
-
                 <div class="flex flex-wrap items-center justify-center gap-3">
-                    <a href="login.html" class="flex items-center gap-2 bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-4 py-2.5 rounded-xl shadow-lg transition text-amber-300 hover:text-amber-100 text-xs font-bold font-rpg tracking-wider">
-                        <i class="fa-solid fa-lock text-amber-500"></i> Painel Adm
-                    </a>
-
+                    <a href="login.html" class="flex items-center gap-2 bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-4 py-2.5 rounded-xl shadow-lg transition text-amber-300 hover:text-amber-100 text-xs font-bold font-rpg tracking-wider"><i class="fa-solid fa-lock text-amber-500"></i> Painel Adm</a>
                     <div class="flex items-center gap-3 bg-[#130f0d] border border-[#422b17] px-4 py-2.5 rounded-xl shadow-inner">
-                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                            <i class="fa-solid fa-shield-halved text-sm"></i>
-                        </div>
-                        <div>
-                            <div class="text-[10px] uppercase tracking-wider text-amber-500/80 font-bold">Banco de Dados</div>
-                            <div class="text-xs font-semibold text-emerald-400">Supabase Conectado</div>
-                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400"><i class="fa-solid fa-shield-halved text-sm"></i></div>
+                        <div><div class="text-[10px] uppercase tracking-wider text-amber-500/80 font-bold">Banco de Dados</div><div class="text-xs font-semibold text-emerald-400">Supabase Conectado</div></div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- FORMULÁRIO ÚNICO INTEGRADO -->
+        <!-- FORMULÁRIO -->
         <form id="itemForm" class="space-y-6">
 
-            <!-- SEÇÃO I: IDENTIDADE DO HERÓI -->
+            <!-- SEÇÃO I: IDENTIDADE -->
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]">
-                    <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">I</span>
-                    <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">IDENTIDADE DO HERÓI</h2>
-                </div>
-
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">I</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">IDENTIDADE DO HERÓI</h2></div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="charName" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5">Nome do Personagem</label>
-                        <input type="text" id="charName" placeholder="Ex: AnomallaMaster" required
-                            class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 placeholder:text-amber-700/50 focus:outline-none focus:border-amber-600 text-sm">
+                        <input type="text" id="charName" placeholder="Ex: AnomallaMaster" required class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 placeholder:text-amber-700/50 focus:outline-none focus:border-amber-600 text-sm">
                     </div>
-
                     <div>
                         <label for="charClass" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5">Classe</label>
-                        <select id="charClass" required
-                            class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm">
+                        <select id="charClass" required class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm">
                             <option value="" disabled selected>Selecione sua classe</option>
-                            <optgroup label="Segunda Facção / Tribos e Legião">
-                                <option value="Bárbaro">Bárbaro</option>
-                                <option value="Ladino">Ladino</option>
-                                <option value="Xamã">Xamã</option>
-                                <option value="Caçador">Caçador</option>
-                                <option value="Cacique">Cacique</option>
-                            </optgroup>
-                            <optgroup label="Proscritos">
-                                <option value="Necromante">Necromante</option>
-                                <option value="Cavaleiro da Morte">Cavaleiro da Morte</option>
-                                <option value="Bruxo">Bruxo</option>
-                                <option value="Encantador">Encantador</option>
-                                <option value="Ceifador">Ceifador</option>
-                            </optgroup>
+                            <optgroup label="Segunda Facção / Tribos e Legião"><option value="Bárbaro">Bárbaro</option><option value="Ladino">Ladino</option><option value="Xamã">Xamã</option><option value="Caçador">Caçador</option><option value="Cacique">Cacique</option></optgroup>
+                            <optgroup label="Proscritos"><option value="Necromante">Necromante</option><option value="Cavaleiro da Morte">Cavaleiro da Morte</option><option value="Bruxo">Bruxo</option><option value="Encantador">Encantador</option><option value="Ceifador">Ceifador</option></optgroup>
                         </select>
                     </div>
                 </div>
@@ -101,466 +60,414 @@
 
             <!-- SEÇÃO II: TALENTOS DE ALMAHAD -->
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]">
-                    <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">II</span>
-                    <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">TALENTOS DE ALMAHAD</h2>
-                </div>
-
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">II</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">TALENTOS DE ALMAHAD</h2></div>
                 <div class="space-y-4">
-                    <!-- Opções de talentos de 35k -->
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5">
-                            <i class="fa-solid fa-bolt text-amber-600"></i> Talentos de 35k
-                        </label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-amber-600"></i> Talentos de 35k</label>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition">
-                                <input type="radio" name="talentos35k" value="Sim" required class="custom-radio"> Sim (Os 2)
-                            </label>
-                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition">
-                                <input type="radio" name="talentos35k" value="Tenho 1" required class="custom-radio"> Tenho 1
-                            </label>
-                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition">
-                                <input type="radio" name="talentos35k" value="Não tenho nada" required class="custom-radio"> Não tenho nada
-                            </label>
+                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition"><input type="radio" name="talentos35k" value="Sim" required class="custom-radio"> Sim (Os 2)</label>
+                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition"><input type="radio" name="talentos35k" value="Tenho 1" required class="custom-radio"> Tenho 1</label>
+                            <label class="flex items-center justify-center gap-2 bg-[#110e0c] border border-[#422b17] hover:border-amber-600 rounded-xl px-4 py-2.5 text-sm text-amber-100 cursor-pointer transition"><input type="radio" name="talentos35k" value="Não" required class="custom-radio"> Não tenho nada</label>
                         </div>
                     </div>
-
-                    <!-- Ramo e Nível -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="almahadBranch" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-chess-rook text-amber-600"></i> Ramo de Almahad
-                            </label>
-                            <select id="almahadBranch"
-                                class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition">
-                                <option value="" disabled selected>Selecione o ramo</option>
-                                <option value="Assassinos">Assassinos</option>
-                                <option value="Aventureiros">Aventureiros</option>
-                                <option value="Magos">Magos</option>
-                            </select>
+                            <label for="almahadBranch" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-chess-rook text-amber-600"></i> Ramo de Almahad</label>
+                            <select id="almahadBranch" class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition"><option value="" disabled selected>Selecione o ramo</option><option value="Assassinos">Assassinos</option><option value="Aventureiros">Aventureiros</option><option value="Magos">Magos</option></select>
                         </div>
-
                         <div>
-                            <label for="charLevel" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-star text-amber-600"></i> Nível / Talentos
-                            </label>
-                            <select id="charLevel"
-                                class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition">
-                                <option value="" disabled selected>Selecione o nível (1 a 39)</option>
-                                <option value="Nível 1">Nível 1</option>
-                                <option value="Nível 2">Nível 2</option>
-                                <option value="Nível 3">Nível 3</option>
-                                <option value="Nível 4">Nível 4</option>
-                                <option value="Nível 5">Nível 5</option>
-                                <option value="Nível 6">Nível 6</option>
-                                <option value="Nível 7">Nível 7</option>
-                                <option value="Nível 8">Nível 8</option>
-                                <option value="Nível 9">Nível 9</option>
-                                <option value="Nível 10">Nível 10</option>
-                                <option value="Nível 11">Nível 11</option>
-                                <option value="Nível 12">Nível 12</option>
-                                <option value="Nível 13">Nível 13</option>
-                                <option value="Nível 14">Nível 14</option>
-                                <option value="Nível 15">Nível 15</option>
-                                <option value="Nível 16">Nível 16</option>
-                                <option value="Nível 17">Nível 17</option>
-                                <option value="Nível 18">Nível 18</option>
-                                <option value="Nível 19">Nível 19</option>
-                                <option value="Nível 20">Nível 20</option>
-                                <option value="Nível 21">Nível 21</option>
-                                <option value="Nível 22">Nível 22</option>
-                                <option value="Nível 23">Nível 23</option>
-                                <option value="Nível 24">Nível 24</option>
-                                <option value="Nível 25">Nível 25</option>
-                                <option value="Nível 26">Nível 26</option>
-                                <option value="Nível 27">Nível 27</option>
-                                <option value="Nível 28">Nível 28</option>
-                                <option value="Nível 29">Nível 29</option>
-                                <option value="Nível 30">Nível 30</option>
-                                <option value="Nível 31">Nível 31</option>
-                                <option value="Nível 32">Nível 32</option>
-                                <option value="Nível 33">Nível 33</option>
-                                <option value="Nível 34">Nível 34</option>
-                                <option value="Nível 35">Nível 35</option>
-                                <option value="Nível 36">Nível 36</option>
-                                <option value="Nível 36">Nível 37</option>
-                                <option value="Nível 36">Nível 38</option>
-                                <option value="Nível 36">Nível 39</option>
-                            </select>
+                            <label for="charLevel" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-star text-amber-600"></i> Nível / Talentos</label>
+                            <select id="charLevel" class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition"><option value="" disabled selected>Selecione o nível (1 a 39)</option><script>for(let i=1; i<=39; i++) document.write(`<option value="Nível ${i}">Nível ${i}</option>`);</script></select>
                         </div>
                     </div>
-
-                    <!-- Talento da T5 e Ramos Full -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="almahadT5" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-fire text-amber-600"></i> Talento da T5
-                            </label>
-                            <select id="almahadT5"
-                                class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition">
-                                <option value="" disabled selected>Escolha o número (1 a 36)</option>
-                                <option value="T5 Nível 1">1</option>
-                                <option value="T5 Nível 2">2</option>
-                                <option value="T5 Nível 3">3</option>
-                                <option value="T5 Nível 4">4</option>
-                                <option value="T5 Nível 5">5</option>
-                                <option value="T5 Nível 6">6</option>
-                                <option value="T5 Nível 7">7</option>
-                                <option value="T5 Nível 8">8</option>
-                                <option value="T5 Nível 9">9</option>
-                                <option value="T5 Nível 10">10</option>
-                                <option value="T5 Nível 11">11</option>
-                                <option value="T5 Nível 12">12</option>
-                                <option value="T5 Nível 13">13</option>
-                                <option value="T5 Nível 14">14</option>
-                                <option value="T5 Nível 15">15</option>
-                                <option value="T5 Nível 16">16</option>
-                                <option value="T5 Nível 17">17</option>
-                                <option value="T5 Nível 18">18</option>
-                                <option value="T5 Nível 19">19</option>
-                                <option value="T5 Nível 20">20</option>
-                                <option value="T5 Nível 21">21</option>
-                                <option value="T5 Nível 22">22</option>
-                                <option value="T5 Nível 23">23</option>
-                                <option value="T5 Nível 24">24</option>
-                                <option value="T5 Nível 25">25</option>
-                                <option value="T5 Nível 26">26</option>
-                                <option value="T5 Nível 27">27</option>
-                                <option value="T5 Nível 28">28</option>
-                                <option value="T5 Nível 29">29</option>
-                                <option value="T5 Nível 30">30</option>
-                                <option value="T5 Nível 31">31</option>
-                                <option value="T5 Nível 32">32</option>
-                                <option value="T5 Nível 33">33</option>
-                                <option value="T5 Nível 34">34</option>
-                                <option value="T5 Nível 35">35</option>
-                                <option value="T5 Nível 36">36</option>
-                            </select>
+                            <label for="almahadT5" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-600"></i> Talento da T5</label>
+                            <select id="almahadT5" class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition"><option value="" disabled selected>Escolha o número (1 a 36)</option><script>for(let i=1; i<=36; i++) document.write(`<option value="T5 Nível ${i}">${i}</option>`);</script></select>
                         </div>
-
                         <div>
-                            <label for="fullBranches" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5">
-                                <i class="fa-solid fa-layer-group text-amber-600"></i> Ramos Full (1 a 3)
-                            </label>
-                            <select id="fullBranches"
-                                class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition">
-                                <option value="" disabled selected>Quantos ramos full? </option>
-                                <option value="1 Ramo Full">1 Ramo Full</option>
-                                <option value="2 Ramos Full">2 Ramos Full</option>
-                                <option value="3 Ramos Full">3 Ramos Full</option>
-                            </select>
+                            <label for="fullBranches" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-layer-group text-amber-600"></i> Ramos Full (1 a 3)</label>
+                            <select id="fullBranches" class="w-full bg-[#110e0c] border border-[#422b17] rounded-xl px-4 py-2.5 text-amber-100 focus:outline-none focus:border-amber-600 text-sm transition"><option value="" disabled selected>Quantos ramos full?</option><option value="1 Ramo Full">1 Ramo Full</option><option value="2 Ramos Full">2 Ramos Full</option><option value="3 Ramos Full">3 Ramos Full</option></select>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- SEÇÃO III: AMPLIFICAÇÃO DAS ARMAS -->
+            <!-- SEÇÃO III: AMPLIFICAÇÃO DE ARMAS & ESCUDOS -->
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]">
-                    <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">III</span>
-                    <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">AMPLIFICAÇÃO DAS ARMAS (1 A 10 ESTRELAS)</h2>
-                </div>
-
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">III</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">AMPLIFICAÇÃO DE ARMAS & ESCUDOS (1 A 10 ESTRELAS)</h2></div>
                 <div class="space-y-4">
-                    <!-- Arma T5 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma T5</div>
-                                <div class="text-xs text-amber-600 font-medium">Fúria das Profundezas</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noT5" class="custom-checkbox" onchange="toggleWeapon('T5')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkT5" class="custom-checkbox"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampT5" onchange="updateStars('ampT5', 'starsT5')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsT5" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
-
-                    <!-- Arma Map 5 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma Map 5</div>
-                                <div class="text-xs text-amber-600 font-medium">Calor Exclusivo</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noCalor" class="custom-checkbox" onchange="toggleWeapon('Calor')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkCalor" class="custom-checkbox"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampCalor" onchange="updateStars('ampCalor', 'starsCalor')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsCalor" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
-
-                    <!-- Arma PvP -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="text-sm font-bold text-amber-100 font-rpg">Arma PvP</div>
-                                <div class="text-xs text-amber-600 font-medium">Equipamento de Arena</div>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noPvp" class="custom-checkbox" onchange="toggleWeapon('Pvp')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkPvp" class="custom-checkbox"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampPvp" onchange="updateStars('ampPvp', 'starsPvp')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsPvp" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
+                    <script>
+                        const wt = ['Cajado', 'Arco', 'Besta', 'Maça de uma mão', 'Maça de duas mãos', 'Adaga', 'Espada de uma mão', 'Espada de duas mãos', 'Lança', 'Machado de uma mão', 'Machado de duas mãos'];
+                        const wp = [
+                            {id: 'T5', name: 'Arma T5', desc: 'Fúria das Profundezas', kind: 'wf'},
+                            {id: 'Pve', name: 'Arma PvE', desc: 'Equipamento Principal', kind: 'wf'},
+                            {id: 'Map5', name: 'Arma Map 5', desc: 'Calor Exaustivo', kind: 'ld'},
+                            {id: 'Pvp1', name: 'Arma PvP 1', desc: 'Equipamento de Arena', kind: 'wf'},
+                            {id: 'Pvp2', name: 'Arma PvP 2', desc: 'Equipamento de Arena', kind: 'wf'},
+                            {id: 'ShieldPve', name: 'Escudo PvE', desc: 'Equipamento Principal', kind: 'ld'},
+                            {id: 'ShieldPvp', name: 'Escudo PvP', desc: 'Equipamento de Arena', kind: 'ld'}
+                        ];
+                        wp.forEach(w => {
+                            let hc = w.kind === 'wf' ? `
+                                <div class="space-y-1.5 flex-1 pr-2">
+                                    <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600"><option value="Nível 30">Nível 30</option><option value="Nível 33">Nível 33</option></select></div>
+                                    <select id="type${w.id}" class="w-full bg-[#110e0c] border border-[#422b17] rounded-lg px-2.5 py-1 text-xs text-amber-200 focus:outline-none focus:border-amber-600 font-medium"><option value="" disabled selected>Selecione o tipo de arma</option>${wt.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+                                </div>` : `
+                                <div class="space-y-1.5 flex-1 pr-2">
+                                    <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600"><option value="Nível 30">Nível 30</option><option value="Nível 33">Nível 33</option></select></div>
+                                    <div class="text-xs text-amber-600 font-medium">${w.desc}</div>
+                                </div>`;
+                            let so = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                            for(let i=1; i<=10; i++) so += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                            document.write(`<div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3"><div class="flex items-center justify-between gap-2">${hc}<div class="flex items-center gap-3 shrink-0"><label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${w.id}" class="custom-checkbox"> Não tenho</label><label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${w.id}" class="custom-checkbox"> Equipado</label></div></div><select id="amp${w.id}" onchange="updateStars('amp${w.id}', 'stars${w.id}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${so}</select><div id="stars${w.id}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div></div>`);
+                        });
+                    </script>
                 </div>
             </section>
 
-            <!-- SEÇÃO IV: ACESSÓRIOS & AMPLIFICAÇÃO -->
+            <!-- SEÇÃO IV: ACESSÓRIOS PvP & AMPLIFICAÇÃO -->
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center justify-between mb-5 pb-3 border-b border-[#352214]">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">IV</span>
-                        <h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">ACESSÓRIOS & AMPLIFICAÇÃO</h2>
-                    </div>
-                    <div id="equippedCounter" class="text-xs font-semibold bg-[#110e0c] border border-[#422b17] px-3 py-1 rounded-full text-amber-500">
-                        0 / 6 Equipados
-                    </div>
-                </div>
-
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-[#352214]"><div class="flex items-center gap-2.5"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">IV</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">ACESSÓRIOS PvP & AMPLIFICAÇÃO</h2></div></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Anel 1 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Anel 1</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noAnel1" class="custom-checkbox" onchange="toggleAccessory('Anel1')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkAnel1" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampAnel1" onchange="updateStars('ampAnel1', 'starsAnel1')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsAnel1" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
+                    <script>
+                        ['Anel1Pvp', 'Anel2Pvp', 'Bracelete1Pvp', 'Bracelete2Pvp', 'AmuletoPvp', 'CapaPvp'].forEach(acc => {
+                            let title = acc.replace('Pvp', '').replace('1', ' 1').replace('2', ' 2');
+                            let starOpts = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                            for(let i=1; i<=10; i++) starOpts += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                            let typeOpts = '<option value="Competidor">Competidor</option><option value="GZ">GZ</option>';
+                            if(acc.includes('Anel')) typeOpts += '<option value="Resistir">Resistir</option>';
+                            document.write(`
+                                <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="space-y-1.5 flex-1 pr-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-bold text-amber-100 font-rpg">${title}</span>
+                                                <select id="type${acc}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600">${typeOpts}</select>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3 shrink-0">
+                                            <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${acc}" class="custom-checkbox"> Não tenho</label>
+                                            <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${acc}" class="custom-checkbox"> Equipado</label>
+                                        </div>
+                                    </div>
+                                    <select id="amp${acc}" onchange="updateStars('amp${acc}', 'stars${acc}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${starOpts}</select>
+                                    <div id="stars${acc}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+            </section>
 
-                    <!-- Anel 2 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Anel 2</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noAnel2" class="custom-checkbox" onchange="toggleAccessory('Anel2')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkAnel2" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
+            <!-- SEÇÃO V: SET PvP & AMPLIFICAÇÃO -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">V</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">SET PvP & AMPLIFICAÇÃO</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <script>
+                        [{id: 'HelmetPvp', name: 'Elmo PvP'}, {id: 'ChestPvp', name: 'Peito PvP'}, {id: 'BootsPvp', name: 'Bota PvP'}, {id: 'GlovesPvp', name: 'Luva PvP'}].forEach(a => {
+                            let starOpts = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                            for(let i=1; i<=10; i++) starOpts += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                            document.write(`<div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3"><div class="flex items-center justify-between gap-2"><div class="space-y-1.5 flex-1 pr-2"><div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${a.name}</span><select id="type${a.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600"><option value="GZ">GZ</option><option value="AP">AP</option></select></div></div><div class="flex items-center gap-3 shrink-0"><label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${a.id}" class="custom-checkbox"> Não tenho</label><label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${a.id}" class="custom-checkbox"> Equipado</label></div></div><select id="amp${a.id}" onchange="updateStars('amp${a.id}', 'stars${a.id}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${starOpts}</select><div id="stars${a.id}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div></div>`);
+                        });
+                    </script>
+                </div>
+                <div class="mt-6 bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <span class="text-sm font-bold text-amber-100 font-rpg flex items-center gap-2"><i class="fa-solid fa-skull text-red-500"></i> Possui Set Catacumba?</span>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-1.5 text-xs text-amber-300 cursor-pointer"><input type="radio" name="hasCatacumba" value="nao" checked onchange="toggleCatacumbaType(false)" class="custom-radio"> Não</label>
+                            <label class="flex items-center gap-1.5 text-xs text-amber-300 cursor-pointer"><input type="radio" name="hasCatacumba" value="sim" onchange="toggleCatacumbaType(true)" class="custom-radio"> Sim</label>
                         </div>
-                        <select id="ampAnel2" onchange="updateStars('ampAnel2', 'starsAnel2')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsAnel2" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
                     </div>
-
-                    <!-- Bracelete 1 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Bracelete 1</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noBracelete1" class="custom-checkbox" onchange="toggleAccessory('Bracelete1')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkBracelete1" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampBracelete1" onchange="updateStars('ampBracelete1', 'starsBracelete1')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsBracelete1" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
-
-                    <!-- Bracelete 2 -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Bracelete 2</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noBracelete2" class="custom-checkbox" onchange="toggleAccessory('Bracelete2')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkBracelete2" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampBracelete2" onchange="updateStars('ampBracelete2', 'starsBracelete2')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsBracelete2" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
-
-                    <!-- Amuleto -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Amuleto</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noAmuleto" class="custom-checkbox" onchange="toggleAccessory('Amuleto')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkAmuleto" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampAmuleto" onchange="updateStars('ampAmuleto', 'starsAmuleto')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsAmuleto" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
-                    </div>
-
-                    <!-- Capa -->
-                    <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-amber-100 font-rpg">Capa</span>
-                            <div class="flex items-center gap-3">
-                                <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer">
-                                    <input type="checkbox" id="noCapa" class="custom-checkbox" onchange="toggleAccessory('Capa')"> Não tenho
-                                </label>
-                                <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer">
-                                    <input type="checkbox" id="checkCapa" class="custom-checkbox" onchange="updateCounter()"> Equipado
-                                </label>
-                            </div>
-                        </div>
-                        <select id="ampCapa" onchange="updateStars('ampCapa', 'starsCapa')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">
-                            <option value="+0 (Sem amp)">+0 (Sem amp)</option>
-                            <option value="+1 Estrela">+1 Estrela</option>
-                            <option value="+2 Estrelas">+2 Estrelas</option>
-                            <option value="+3 Estrelas">+3 Estrelas</option>
-                            <option value="+4 Estrelas">+4 Estrelas</option>
-                            <option value="+5 Estrelas">+5 Estrelas</option>
-                            <option value="+6 Estrelas">+6 Estrelas</option>
-                            <option value="+7 Estrelas">+7 Estrelas</option>
-                            <option value="+8 Estrelas">+8 Estrelas</option>
-                            <option value="+9 Estrelas">+9 Estrelas</option>
-                            <option value="+10 Estrelas">+10 Estrelas</option>
-                        </select>
-                        <div id="starsCapa" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                    <div id="catacumbaTypeContainer" class="hidden space-y-1.5 pt-3 border-t border-[#302015]">
+                        <label for="catacumbaType" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1">Tipo do Catacumba</label>
+                        <select id="catacumbaType" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-600"><option value="" disabled selected>Selecione o tipo</option><option value="Leve">Leve</option><option value="Tecido">Tecido</option><option value="Pesado">Pesado</option></select>
                     </div>
                 </div>
             </section>
 
-            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold py-3.5 px-6 rounded-xl transition duration-200 shadow-xl font-rpg tracking-wider text-sm sm:text-base border border-amber-400 cursor-pointer flex items-center justify-center gap-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i> ENVIAR CREDENCIAIS COMPLETAS PARA A GUILDA
+            <!-- SEÇÃO VI: ACESSÓRIOS PvE & AMPLIFICAÇÃO -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-5 pb-3 border-b border-[#352214]"><div class="flex items-center gap-2.5"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">VI</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">ACESSÓRIOS PvE & AMPLIFICAÇÃO</h2></div></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <script>
+                        ['Anel1Pve', 'Anel2Pve', 'Bracelete1Pve', 'Bracelete2Pve', 'AmuletoPve', 'CapaPve'].forEach(acc => {
+                            let title = acc.replace('Pve', '').replace('1', ' 1').replace('2', ' 2');
+                            let starOpts = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                            for(let i=1; i<=10; i++) starOpts += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                            let typeOpts = '<option value="CD">CD</option><option value="F.A.">F.A.</option><option value="F.A.C.">F.A.C.</option><option value="PH">PH</option><option value="Fúria">Fúria</option>';
+                            document.write(`
+                                <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="space-y-1.5 flex-1 pr-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-bold text-amber-100 font-rpg">${title}</span>
+                                                <select id="type${acc}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600">${typeOpts}</select>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3 shrink-0">
+                                            <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${acc}" class="custom-checkbox"> Não tenho</label>
+                                            <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${acc}" class="custom-checkbox"> Equipado</label>
+                                        </div>
+                                    </div>
+                                    <select id="amp${acc}" onchange="updateStars('amp${acc}', 'stars${acc}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${starOpts}</select>
+                                    <div id="stars${acc}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+            </section>
+
+            <!-- SEÇÃO VII: SET PvE & AMPLIFICAÇÃO -->
+            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">VII</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">SET PvE & AMPLIFICAÇÃO</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <script>
+                        [{id: 'HelmetPve', name: 'Elmo PvE'}, {id: 'ChestPve', name: 'Peito PvE'}, {id: 'BootsPve', name: 'Bota PvE'}, {id: 'GlovesPve', name: 'Luva PvE'}].forEach(a => {
+                            let starOpts = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                            for(let i=1; i<=10; i++) starOpts += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                            let typeOpts = '<option value="Tecido">Tecido</option><option value="Leve">Leve</option><option value="Pesado">Pesado</option>';
+                            document.write(`
+                                <div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="space-y-1.5 flex-1 pr-2">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-bold text-amber-100 font-rpg">${a.name}</span>
+                                                <select id="type${a.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600">${typeOpts}</select>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-3 shrink-0">
+                                            <label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${a.id}" class="custom-checkbox"> Não tenho</label>
+                                            <label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${a.id}" class="custom-checkbox"> Equipado</label>
+                                        </div>
+                                    </div>
+                                    <select id="amp${a.id}" onchange="updateStars('amp${a.id}', 'stars${a.id}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${starOpts}</select>
+                                    <div id="stars${a.id}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div>
+                                </div>
+                            `);
+                        });
+                    </script>
+                </div>
+                <div class="mt-6 bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <span class="text-sm font-bold text-amber-100 font-rpg flex items-center gap-2"><i class="fa-solid fa-water text-cyan-500"></i> Possui Set Mermem?</span>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-1.5 text-xs text-amber-300 cursor-pointer"><input type="radio" name="hasMermem" value="nao" checked onchange="toggleMermemType(false)" class="custom-radio"> Não</label>
+                            <label class="flex items-center gap-1.5 text-xs text-amber-300 cursor-pointer"><input type="radio" name="hasMermem" value="sim" onchange="toggleMermemType(true)" class="custom-radio"> Sim</label>
+                        </div>
+                    </div>
+                    <div id="mermemTypeContainer" class="hidden space-y-1.5 pt-3 border-t border-[#302015]">
+                        <label for="mermemType" class="block text-xs font-bold uppercase tracking-wider text-amber-500/90 mb-1">Tipo do Mermem</label>
+                        <select id="mermemType" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-2 text-xs text-amber-200 focus:outline-none focus:border-amber-600"><option value="" disabled selected>Selecione o tipo</option><option value="Leve">Leve</option><option value="Tecido">Tecido</option><option value="Pesado">Pesado</option></select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTÃO DE ENVIO -->
+            <button type="submit" class="w-full relative group cursor-pointer transition-transform active:scale-[0.98] py-2">
+                <div class="absolute inset-0 bg-gradient-to-b from-amber-300 via-amber-500 to-amber-800 rounded-2xl shadow-2xl border-2 border-amber-200/80"></div>
+                <div class="relative m-1.5 bg-gradient-to-b from-cyan-400 via-sky-500 to-blue-600 hover:from-cyan-300 hover:to-blue-500 rounded-xl py-3.5 px-6 shadow-inner border border-cyan-200/50 flex items-center justify-center gap-2.5">
+                    <i class="fa-solid fa-scroll text-cyan-100 drop-shadow"></i>
+                    <span class="font-rpg font-bold text-white text-base sm:text-lg tracking-wider drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]">ENVIAR DADOS DA GUILDA</span>
+                </div>
             </button>
         </form>
-
     </main>
 
-    <footer class="w-full text-center py-6 text-xs text-amber-700/60 font-rpg tracking-wider relative z-10">
-        GUILDA ANOMALIA &copy; 2026
-    </footer>
+    <footer class="w-full text-center py-6 text-xs text-amber-700/60 font-rpg tracking-wider relative z-10 border-t border-[#261b12] mt-12">GUILDA ANOMALIA &copy; 2026 &bull; Servidor BR-Tourmaline. Todos os direitos reservados.</footer>
 
-    <!-- Link para o Script Externo -->
-    <script src="script.js"></script>
+    <!-- Script de Integração e Funcionalidades -->
+    <script>
+        const SUPABASE_URL = 'https://tfgjfscnuemunuwzvtjr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vCiz2wBxb7yRfrfhJxYOfg__u3kka3W';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function updateStars(selectId, starsId) {
+            const select = document.getElementById(selectId);
+            const starsContainer = document.getElementById(starsId);
+            if (!select || !starsContainer) return;
+            const value = select.value;
+            let count = 0;
+            if (value.includes('+')) {
+                const match = value.match(/\+(\d+)/);
+                if (match) count = parseInt(match[1]);
+            }
+            let starsHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                starsHTML += `<span class="${i <= count ? 'text-amber-400' : 'text-amber-700/40'}">★</span>`;
+            }
+            starsContainer.innerHTML = starsHTML;
+        }
+
+        const itemIds = [
+            'T5', 'Pve', 'Map5', 'Pvp1', 'Pvp2', 'ShieldPve', 'ShieldPvp',
+            'Anel1Pvp', 'Anel2Pvp', 'Bracelete1Pvp', 'Bracelete2Pvp', 'AmuletoPvp', 'CapaPvp',
+            'HelmetPvp', 'ChestPvp', 'BootsPvp', 'GlovesPvp',
+            'Anel1Pve', 'Anel2Pve', 'Bracelete1Pve', 'Bracelete2Pve', 'AmuletoPve', 'CapaPve',
+            'HelmetPve', 'ChestPve', 'BootsPve', 'GlovesPve'
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            itemIds.forEach(id => {
+                const no = document.getElementById('no' + id);
+                const chk = document.getElementById('check' + id);
+                const amp = document.getElementById('amp' + id);
+                if (no && amp) {
+                    no.addEventListener('change', () => {
+                        if (chk) { chk.checked = false; chk.disabled = no.checked; }
+                        amp.value = '+0 (Sem amp)';
+                        amp.disabled = no.checked;
+                        amp.classList.toggle('opacity-50', no.checked);
+                        amp.classList.toggle('cursor-not-allowed', no.checked);
+                        updateStars('amp' + id, 'stars' + id);
+                    });
+                }
+                if (chk && no) {
+                    chk.addEventListener('change', () => { if (chk.checked) no.checked = false; });
+                }
+            });
+        });
+
+        function toggleCatacumbaType(show) {
+            const container = document.getElementById('catacumbaTypeContainer');
+            const select = document.getElementById('catacumbaType');
+            if (container && select) {
+                if (show) {
+                    container.classList.remove('hidden');
+                    select.setAttribute('required', 'true');
+                } else {
+                    container.classList.add('hidden');
+                    select.removeAttribute('required');
+                    select.value = '';
+                }
+            }
+        }
+
+        function toggleMermemType(show) {
+            const container = document.getElementById('mermemTypeContainer');
+            const select = document.getElementById('mermemType');
+            if (container && select) {
+                if (show) {
+                    container.classList.remove('hidden');
+                    select.setAttribute('required', 'true');
+                } else {
+                    container.classList.add('hidden');
+                    select.removeAttribute('required');
+                    select.value = '';
+                }
+            }
+        }
+
+        document.getElementById('itemForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            const getItemData = (id) => ({
+                nao_tem: document.getElementById('no' + id)?.checked || false,
+                equipado: document.getElementById('check' + id)?.checked || false,
+                amplificacao: document.getElementById('amp' + id)?.value || '+0 (Sem amp)',
+                tipo: document.getElementById('type' + id)?.value || '-',
+                nivel: document.getElementById('level' + id)?.value || '-'
+            });
+
+            const charName = document.getElementById('charName').value.trim();
+            const talentos35kEl = document.querySelector('input[name="talentos35k"]:checked');
+            const hasCatacumbaEl = document.querySelector('input[name="hasCatacumba"]:checked');
+            const hasMermemEl = document.querySelector('input[name="hasMermem"]:checked');
+
+            const payload = {
+                char_name: charName,
+                char_class: document.getElementById('charClass').value,
+                char_level: document.getElementById('charLevel').value || '-',
+                talentos_35k: talentos35kEl ? talentos35kEl.value : 'Não',
+                almahad_branch: document.getElementById('almahadBranch')?.value || '-',
+                almahad_t5: document.getElementById('almahadT5')?.value || '-',
+                full_branches: document.getElementById('fullBranches')?.value || '-',
+
+                // Armas e Escudos
+                weapon_t5: getItemData('T5'),
+                weapon_pve: getItemData('Pve'),
+                weapon_map5: getItemData('Map5'),
+                weapon_pvp1: getItemData('Pvp1'),
+                weapon_pvp2: getItemData('Pvp2'),
+                shield_pve: getItemData('ShieldPve'),
+                shield_pvp: getItemData('ShieldPvp'),
+
+                // Acessórios PvP
+                acc_anel1_pvp: getItemData('Anel1Pvp'),
+                acc_anel2_pvp: getItemData('Anel2Pvp'),
+                acc_bracelete1_pvp: getItemData('Bracelete1Pvp'),
+                acc_bracelete2_pvp: getItemData('Bracelete2Pvp'),
+                acc_amuleto_pvp: getItemData('AmuletoPvp'),
+                acc_capa_pvp: getItemData('CapaPvp'),
+
+                // Set PvP & Catacumba
+                set_helmet_pvp: getItemData('HelmetPvp'),
+                set_chest_pvp: getItemData('ChestPvp'),
+                set_boots_pvp: getItemData('BootsPvp'),
+                set_gloves_pvp: getItemData('GlovesPvp'),
+                has_catacumba: hasCatacumbaEl ? hasCatacumbaEl.value === 'sim' : false,
+                catacumba_type: document.getElementById('catacumbaType')?.value || '-',
+
+                // Acessórios PvE
+                acc_anel1_pve: getItemData('Anel1Pve'),
+                acc_anel2_pve: getItemData('Anel2Pve'),
+                acc_bracelete1_pve: getItemData('Bracelete1Pve'),
+                acc_bracelete2_pve: getItemData('Bracelete2Pve'),
+                acc_amuleto_pve: getItemData('AmuletoPve'),
+                acc_capa_pve: getItemData('CapaPve'),
+
+                // Set PvE & Mermem
+                set_helmet_pve: getItemData('HelmetPve'),
+                set_chest_pve: getItemData('ChestPve'),
+                set_boots_pve: getItemData('BootsPve'),
+                set_gloves_pve: getItemData('GlovesPve'),
+                has_mermem: hasMermemEl ? hasMermemEl.value === 'sim' : false,
+                mermem_type: document.getElementById('mermemType')?.value || '-',
+
+                created_at: new Date().toISOString()
+            };
+
+            try {
+                const { data: existing, error: searchError } = await supabaseClient
+                    .from('guild_members')
+                    .select('id')
+                    .eq('char_name', charName)
+                    .maybeSingle();
+
+                if (searchError) throw searchError;
+
+                let result;
+                if (existing) {
+                    result = await supabaseClient
+                        .from('guild_members')
+                        .update(payload)
+                        .eq('id', existing.id);
+                } else {
+                    result = await supabaseClient
+                        .from('guild_members')
+                        .insert([payload]);
+                }
+
+                if (result.error) throw result.error;
+
+                alert('Dados do herói enviados/atualizados com sucesso!');
+                e.target.reset();
+                itemIds.forEach(id => updateStars('amp' + id, 'stars' + id));
+                toggleCatacumbaType(false);
+                toggleMermemType(false);
+
+            } catch (error) {
+                console.error('Erro ao salvar no Supabase:', error);
+                alert('Erro ao enviar dados: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>

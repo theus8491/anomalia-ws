@@ -4,335 +4,305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Adm - Guilda Anomalia</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Supabase Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- jsPDF para exportar relatório -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- jsPDF AutoTable Plugin (Para tabelas no PDF) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0d0b09;
-            color: #abdcb2;
-            background-image: 
-                radial-gradient(circle at 50% 10%, #291c13 0%, #0d0b09 60%),
-                linear-gradient(to bottom, rgba(13, 11, 9, 0.95), rgba(7, 5, 4, 0.98));
-            background-attachment: fixed;
-        }
-        h1, h2, h3, .font-rpg {
-            font-family: 'Cinzel', serif;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0d0b09 radial-gradient(circle at 50% 10%, #291c13 0%, #0d0b09 60%); color: #abdcb2; }
+        h1, h2, h3, .font-rpg { font-family: 'Cinzel', serif; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white p-4">
-
-    <main class="w-full max-w-[95%] mx-auto space-y-6 my-auto">
-        
-        <!-- HEADER DO PAINEL -->
-        <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white p-2 sm:p-4">
+    <main class="w-full max-w-7xl mx-auto space-y-4 my-auto">
+        <!-- HEADER -->
+        <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-400 border border-amber-800/50 mb-1">
-                    <i class="fa-solid fa-lock-open"></i> Área Administrativa
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-black text-amber-100 font-rpg">Painel de Gerenciamento</h1>
+                <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-950/80 text-amber-400 border border-amber-800/50 mb-1"><i class="fa-solid fa-lock-open"></i> Painel Administrativo</span>
+                <h1 class="text-2xl font-black text-amber-100 font-rpg">Gerenciamento - Guilda Anomalia</h1>
             </div>
-
-            <div class="flex items-center gap-3">
-                <button onclick="carregarMembros()" class="flex items-center gap-2 bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-4 py-2.5 rounded-xl text-amber-300 text-xs font-bold font-rpg transition cursor-pointer">
-                    <i class="fa-solid fa-rotate"></i> Atualizar
-                </button>
-                <button onclick="gerarPDF()" class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-stone-950 px-4 py-2.5 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg">
-                    <i class="fa-solid fa-file-pdf"></i> Baixar PDF
-                </button>
-                <a href="index.html" class="flex items-center gap-2 bg-red-950/60 hover:bg-red-900/60 border border-red-800/50 px-4 py-2.5 rounded-xl text-red-300 text-xs font-bold font-rpg transition">
-                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair
-                </a>
+            <div class="flex items-center gap-2">
+                <button onclick="carregarMembros()" class="bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-3 py-2 rounded-xl text-amber-300 text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                <button onclick="gerarPDF()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                <a href="index.html" class="bg-red-950/60 hover:bg-red-900/60 border border-red-800/50 px-3 py-2 rounded-xl text-red-300 text-xs font-bold font-rpg transition flex items-center gap-1"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
             </div>
         </header>
 
-        <!-- ESTATÍSTICAS -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Total de Membros</div>
-                    <div id="totalMembros" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
-                </div>
-                <i class="fa-solid fa-users text-2xl text-amber-600/50"></i>
-            </div>
-            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Clãs / Segunda Facção</div>
-                    <div id="totalClas" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
-                </div>
-                <i class="fa-solid fa-shield text-2xl text-amber-600/50"></i>
-            </div>
-            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs uppercase tracking-wider text-amber-500 font-bold">Proscritos</div>
-                    <div id="totalProscritos" class="text-2xl font-black text-amber-100 font-rpg mt-1">0</div>
-                </div>
-                <i class="fa-solid fa-skull text-2xl text-amber-600/50"></i>
-            </div>
+        <!-- STATS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Total de Membros</div><div id="totalMembros" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-users text-xl text-amber-600/50"></i></div>
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Clãs / Segunda Facção</div><div id="totalClas" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-shield text-xl text-amber-600/50"></i></div>
+            <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Proscritos</div><div id="totalProscritos" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-skull text-xl text-amber-600/50"></i></div>
         </div>
 
-        <!-- TABELA DE REGISTROS -->
-        <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-6 shadow-xl overflow-hidden space-y-4">
-            <h2 class="text-lg font-bold text-amber-200 font-rpg">Heróis Cadastrados</h2>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="border-b border-[#352214] text-amber-500 font-rpg">
-                            <th class="py-3 px-2">Personagem</th>
-                            <th class="py-3 px-2">Classe</th>
-                            <th class="py-3 px-2 text-center">Talentos 35k</th>
-                            <th class="py-3 px-2 text-center">Ramo Almahad</th>
-                            <th class="py-3 px-2 text-center">Nível</th>
-                            <th class="py-3 px-2 text-center">T5</th>
-                            <th class="py-3 px-2 text-center">Ramos Full</th>
-                            <th class="py-3 px-2 text-center">Arma T5</th>
-                            <th class="py-3 px-2 text-center">Map 5</th>
-                            <th class="py-3 px-2 text-center">PvP</th>
-                            <th class="py-3 px-2 text-center">Anel 1</th>
-                            <th class="py-3 px-2 text-center">Anel 2</th>
-                            <th class="py-3 px-2 text-center">Brac 1</th>
-                            <th class="py-3 px-2 text-center">Brac 2</th>
-                            <th class="py-3 px-2 text-center">Amulet</th>
-                            <th class="py-3 px-2 text-center">Capa</th>
-                            <th class="py-3 px-2 text-center">Data</th>
-                            <th class="py-3 px-2 text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaMembros" class="divide-y divide-[#291c13] text-amber-100">
-                        <tr>
-                            <td colspan="18" class="py-6 text-center text-amber-600 italic">Carregando heróis da guilda...</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- CONTAINER PRINCIPAL DOS HERÓIS -->
+        <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-2 border-b border-[#352214] pb-3">
+                <h2 class="text-base font-bold text-amber-200 font-rpg">Heróis Cadastrados (Sets Separados por Containers)</h2>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-amber-600 text-[10px]"></i>
+                        <input type="text" id="buscaNome" placeholder="Buscar herói..." oninput="carregarMembros()" class="bg-[#130f0d] border border-[#422b17] rounded-lg pl-7 pr-2.5 py-1.5 text-amber-200 placeholder-amber-700/60 focus:outline-none focus:border-amber-600 w-36 sm:w-44">
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-amber-500 font-bold">Filtrar:</span>
+                        <select id="filtroClasse" onchange="carregarMembros()" class="bg-[#130f0d] border border-[#422b17] rounded-lg px-2 py-1.5 text-amber-200 focus:outline-none">
+                            <option value="todos">Todas as Classes</option>
+                            <option value="classicos">Segunda Facção / Tribos e Legião</option>
+                            <option value="proscritos">Proscritos</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div id="statusMensagem" class="text-center text-xs text-amber-500 font-rpg pt-2"></div>
+
+            <!-- GRID DE CARDS DOS MEMBROS -->
+            <div id="gridMembros" class="grid grid-cols-1 xl:grid-cols-2 gap-4 max-h-[70vh] overflow-y-auto pr-1">
+                <div class="text-center py-10 text-amber-600 italic col-span-full">Carregando heróis...</div>
+            </div>
+
+            <div id="statusMensagem" class="text-center text-xs text-amber-500 font-rpg"></div>
         </section>
-
     </main>
-
-    <footer class="w-full text-center py-6 text-xs text-amber-700/60 font-rpg tracking-wider">
-        GUILDA ANOMALIA &copy; 2026
-    </footer>
+    <footer class="w-full text-center py-3 text-xs text-amber-700/60 font-rpg tracking-wider">GUILDA ANOMALIA &copy; 2026</footer>
 
     <script>
-        // Credenciais Corretas do Supabase
-        const SUPABASE_URL = 'https://krabfzjnejvpatufolma.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_VIh6KfT200rJ28XySTS71g_w0tIO4s5';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        const classesProscritos = ['Necromante', 'Cavaleiro da Morte', 'Bruxo', 'Encantador', 'Ceifador'];
-        let membrosCache = [];
+        const SUPABASE_URL = 'https://tfgjfscnuemunuwzvtjr.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_vCiz2wBxb7yRfrfhJxYOfg__u3kka3W';
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const proscritos = ['Necromante', 'Cavaleiro da Morte', 'Bruxo', 'Encantador', 'Ceifador'];
+        let cache = [];
 
         async function carregarMembros() {
-            const statusEl = document.getElementById('statusMensagem');
-            statusEl.textContent = 'Buscando dados no Supabase...';
+            document.getElementById('statusMensagem').textContent = 'Buscando dados no Supabase...';
+            const { data, error } = await _supabase.from('guild_members').select('*').order('created_at', { ascending: false });
+            if (error) { document.getElementById('statusMensagem').textContent = 'Erro: ' + error.message; return; }
+            document.getElementById('statusMensagem').textContent = '';
+            cache = data || [];
+            
+            const filtro = document.getElementById('filtroClasse').value;
+            const termoBusca = document.getElementById('buscaNome').value.toLowerCase().trim();
 
-            try {
-                const { data, error } = await _supabase
-                    .from('guild_members')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+            let filtrados = cache;
 
-                if (error) throw error;
-
-                statusEl.textContent = '';
-                membrosCache = data || [];
-                renderizarTabela(membrosCache);
-            } catch (error) {
-                console.error("Erro ao carregar do Supabase:", error.message);
-                statusEl.textContent = 'Erro ao carregar: ' + error.message;
+            if (filtro === 'classicos') {
+                filtrados = filtrados.filter(m => !proscritos.includes(m.char_class));
+            } else if (filtro === 'proscritos') {
+                filtrados = filtrados.filter(m => proscritos.includes(m.char_class));
             }
+
+            if (termoBusca) {
+                filtrados = filtrados.filter(m => (m.char_name || '').toLowerCase().includes(termoBusca));
+            }
+
+            render(filtrados);
         }
 
-        function ehNaoTenho(val) {
-            if (val === undefined || val === null) return true;
-            if (typeof val === 'boolean') return !val;
+        // Função para extrair e formatar o dado enviado como Objeto JSON do formulário
+        function formatItem(itemObj) {
+            if (!itemObj) return '<span class="text-red-400">Não tenho</span>';
             
-            const lower = String(val).toLowerCase().trim();
-            if (['nao tenho', 'não tenho', 'nao_tenho', 'false', '-', '', 'não', 'nao', '+0 (sem amp)'].includes(lower)) {
-                return true;
+            // Se veio como string simples antiga
+            if (typeof itemObj === 'string') {
+                if (['não tenho', 'nao tenho', '-', '', 'não', 'nao', '+0 (sem amp)'].includes(itemObj.toLowerCase())) {
+                    return '<span class="text-red-400">Não tenho</span>';
+                }
+                return `<span class="text-amber-200 font-bold">${itemObj}</span>`;
             }
-            return false;
+
+            if (itemObj.nao_tem) {
+                return '<span class="text-red-400">Não tenho</span>';
+            }
+
+            let texto = '';
+            if (itemObj.amplificacao && itemObj.amplificacao !== '+0 (Sem amp)') {
+                texto += `<span class="text-purple-300 font-bold">${itemObj.amplificacao}</span> `;
+            }
+            if (itemObj.tipo && itemObj.tipo !== '-') {
+                texto += `<span class="text-amber-200">(${itemObj.tipo})</span> `;
+            }
+            if (itemObj.nivel && itemObj.nivel !== '-') {
+                texto += `<span class="text-emerald-400">Nvl ${itemObj.nivel}</span>`;
+            }
+
+            if (!texto) {
+                if (itemObj.equipado) return '<span class="text-emerald-400 font-bold">Equipado</span>';
+                return '<span class="text-amber-300">Possui</span>';
+            }
+
+            return texto;
         }
 
-        function renderizarTabela(membros) {
-            const tbody = document.getElementById('tabelaMembros');
-            tbody.innerHTML = '';
-
-            document.getElementById('totalMembros').textContent = membros.length;
+        function badgeItem(nomeItem, itemObj, isPvp = true) {
+            const detalhe = formatItem(itemObj);
+            const isNaoTem = !itemObj || itemObj.nao_tem || (typeof itemObj === 'string' && ['não tenho', 'nao tenho', '-', ''].includes(itemObj.toLowerCase()));
+            const bgCor = isNaoTem ? 'bg-red-950/20 border-red-900/30' : (isPvp ? 'bg-purple-950/30 border-purple-900/40' : 'bg-emerald-950/30 border-emerald-900/40');
             
-            let clasCount = 0;
-            let proscritosCount = 0;
+            return `
+                <div class="flex items-center justify-between bg-[#130f0d] border ${bgCor} px-2 py-1 rounded text-[11px]">
+                    <span class="text-amber-500/80 font-medium">${nomeItem}:</span>
+                    <span>${detalhe}</span>
+                </div>
+            `;
+        }
 
-            if (membros.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="18" class="py-6 text-center text-amber-600 italic">Nenhum herói cadastrado ainda.</td></tr>`;
-                document.getElementById('totalClas').textContent = 0;
-                document.getElementById('totalProscritos').textContent = 0;
+        function render(membros) {
+            const grid = document.getElementById('gridMembros');
+            grid.innerHTML = '';
+            document.getElementById('totalMembros').textContent = cache.length;
+            let clas = 0, pros = 0;
+
+            cache.forEach(m => {
+                if (proscritos.includes(m.char_class)) pros++; else clas++;
+            });
+            document.getElementById('totalClas').textContent = clas;
+            document.getElementById('totalProscritos').textContent = pros;
+
+            if (!membros.length) {
+                grid.innerHTML = `<div class="text-center py-10 text-amber-600 italic col-span-full">Nenhum herói encontrado com os filtros atuais.</div>`;
                 return;
             }
 
             membros.forEach(m => {
-                if (classesProscritos.includes(m.char_class)) {
-                    proscritosCount++;
-                } else {
-                    clasCount++;
-                }
+                const dt = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
 
-                const ampT5 = m.amp_t5 || '-';
-                const ampCalor = m.amp_calor || '-';
-                const ampPvp = m.amp_pvp || '-';
+                const cat = m.has_catacumba ? `<span class="text-emerald-400 font-bold">${m.catacumba_type || 'Sim'}</span>` : '<span class="text-red-400">Não</span>';
+                const mer = m.has_mermem ? `<span class="text-cyan-400 font-bold">${m.mermem_type || 'Sim'}</span>` : '<span class="text-red-400">Não</span>';
 
-                const anel1 = m.anel1 || 'Não tenho';
-                const anel2 = m.anel2 || 'Não tenho';
-                const brac1 = m.brac1 || 'Não tenho';
-                const brac2 = m.brac2 || 'Não tenho';
-                const amu = m.amu || 'Não tenho';
-                const capa = m.capa || 'Não tenho';
+                const card = document.createElement('div');
+                card.className = 'bg-[#130f0d] border border-[#352214] rounded-xl p-3.5 space-y-3 shadow-md hover:border-[#63452c] transition';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-[#291c13] pb-2.5">
+                        <div>
+                            <h3 class="text-base font-black text-amber-100 font-rpg">${m.char_name || '-'}</h3>
+                            <div class="text-xs text-amber-400 font-semibold">${m.char_class || '-'} <span class="text-amber-700 mx-1">•</span> Nível ${m.char_level || '-'}</div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="del('${m.id}')" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-2 py-1 rounded-lg text-xs transition cursor-pointer flex items-center gap-1" title="Excluir Herói"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
 
-                const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
+                    <div class="grid grid-cols-4 gap-2 text-center bg-[#1a1410] p-2 rounded-lg border border-[#291c13] text-[11px]">
+                        <div><span class="text-amber-600 block text-[9px] uppercase font-bold">Tal 35k</span><span class="text-amber-200 font-bold">${m.talentos_35k || '-'}</span></div>
+                        <div><span class="text-amber-600 block text-[9px] uppercase font-bold">Ramo</span><span class="text-amber-200 font-bold">${m.almahad_branch || '-'}</span></div>
+                        <div><span class="text-amber-600 block text-[9px] uppercase font-bold">T5</span><span class="text-amber-200 font-bold">${m.almahad_t5 || '-'}</span></div>
+                        <div><span class="text-amber-600 block text-[9px] uppercase font-bold">Full</span><span class="text-amber-200 font-bold">${m.full_branches || '-'}</span></div>
+                    </div>
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-[#201813] transition';
-                tr.innerHTML = `
-                    <td class="py-3 px-2 font-bold text-amber-200">${m.char_name || 'Desconhecido'}</td>
-                    <td class="py-3 px-2 text-amber-400">${m.char_class || '-'}</td>
-                    <td class="py-3 px-2 text-center text-amber-300">${m.talentos_35k || '-'}</td>
-                    <td class="py-3 px-2 text-center text-amber-300">${m.almahad_branch || '-'}</td>
-                    <td class="py-3 px-2 text-center text-amber-300">${m.char_level || '-'}</td>
-                    <td class="py-3 px-2 text-center text-amber-300">${m.almahad_t5 || '-'}</td>
-                    <td class="py-3 px-2 text-center text-amber-300">${m.full_branches || '-'}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampT5) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampT5}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampCalor) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampCalor}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampPvp) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampPvp}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(anel1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel1}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(anel2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel2}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(brac1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac1}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(brac2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac2}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(amu) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${amu}</td>
-                    <td class="py-3 px-2 text-center ${ehNaoTenho(capa) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${capa}</td>
-                    <td class="py-3 px-2 text-center text-amber-600">${dataFormatada}</td>
-                    <td class="py-3 px-2 text-center">
-                        <button onclick="excluirMembro('${m.id}')" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-2 py-1 rounded-lg text-xs transition cursor-pointer">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div class="bg-purple-950/10 border border-purple-900/40 rounded-xl p-2.5 space-y-1.5">
+                            <div class="text-xs font-bold text-purple-300 font-rpg border-b border-purple-900/40 pb-1 flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Set PvP</div>
+                            <div class="space-y-1">
+                                ${badgeItem('Elmo', m.set_helmet_pvp, true)}
+                                ${badgeItem('Peito', m.set_chest_pvp, true)}
+                                ${badgeItem('Luva', m.set_gloves_pvp, true)}
+                                ${badgeItem('Bota', m.set_boots_pvp, true)}
+                                ${badgeItem('Bracelete 1', m.acc_bracelete1_pvp, true)}
+                                ${badgeItem('Bracelete 2', m.acc_bracelete2_pvp, true)}
+                                ${badgeItem('Anel 1', m.acc_anel1_pvp, true)}
+                                ${badgeItem('Anel 2', m.acc_anel2_pvp, true)}
+                                ${badgeItem('Amuleto', m.acc_amuleto_pvp, true)}
+                                ${badgeItem('Capa', m.acc_capa_pvp, true)}
+                                ${badgeItem('Arma Pvp 1', m.weapon_pvp1, true)}
+                                ${badgeItem('Arma Pvp 2', m.weapon_pvp2, true)}
+                                ${badgeItem('Escudo Pvp', m.shield_pvp, true)}
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-950/10 border border-emerald-900/40 rounded-xl p-2.5 space-y-1.5">
+                            <div class="text-xs font-bold text-emerald-300 font-rpg border-b border-emerald-900/40 pb-1 flex items-center gap-1.5"><i class="fa-solid fa-staff-snake"></i> Set PvE</div>
+                            <div class="space-y-1">
+                                ${badgeItem('Elmo', m.set_helmet_pve, false)}
+                                ${badgeItem('Peito', m.set_chest_pve, false)}
+                                ${badgeItem('Luva', m.set_gloves_pve, false)}
+                                ${badgeItem('Bota', m.set_boots_pve, false)}
+                                ${badgeItem('Bracelete 1', m.acc_bracelete1_pve, false)}
+                                ${badgeItem('Bracelete 2', m.acc_bracelete2_pve, false)}
+                                ${badgeItem('Anel 1', m.acc_anel1_pve, false)}
+                                ${badgeItem('Anel 2', m.acc_anel2_pve, false)}
+                                ${badgeItem('Amuleto', m.acc_amuleto_pve, false)}
+                                ${badgeItem('Capa', m.acc_capa_pve, false)}
+                                ${badgeItem('Arma T5', m.weapon_t5, false)}
+                                ${badgeItem('Arma Pve', m.weapon_pve, false)}
+                                ${badgeItem('Arma Map5', m.weapon_map5, false)}
+                                ${badgeItem('Escudo Pve', m.shield_pve, false)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 border-t border-[#291c13] text-[11px] text-amber-400">
+                        <div class="flex items-center gap-3">
+                            <span>Catacumba: ${cat}</span>
+                            <span>Mermem: ${mer}</span>
+                        </div>
+                        <span class="text-amber-700">${dt}</span>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                grid.appendChild(card);
             });
-
-            document.getElementById('totalClas').textContent = clasCount;
-            document.getElementById('totalProscritos').textContent = proscritosCount;
         }
 
-        async function excluirMembro(id) {
-            if (!confirm('Tem certeza que deseja remover este herói da guilda?')) return;
-
+        async function del(id) {
+            if (!confirm('Deseja realmente remover este herói da guilda?')) return;
             const { error } = await _supabase.from('guild_members').delete().eq('id', id);
-            if (error) {
-                alert('Erro ao excluir: ' + error.message);
-            } else {
-                carregarMembros();
-            }
+            if (error) alert('Erro ao excluir: ' + error.message); else carregarMembros();
+        }
+
+        function extrairTextoPdf(itemObj) {
+            if (!itemObj || itemObj.nao_tem) return 'Não';
+            if (typeof itemObj === 'string') return itemObj;
+            let res = [];
+            if (itemObj.amplificacao && itemObj.amplificacao !== '+0 (Sem amp)') res.push(itemObj.amplificacao);
+            if (itemObj.tipo && itemObj.tipo !== '-') res.push(itemObj.tipo);
+            if (itemObj.nivel && itemObj.nivel !== '-') res.push('Nvl ' + itemObj.nivel);
+            return res.length ? res.join(' ') : 'Sim';
         }
 
         function gerarPDF() {
-            if (membrosCache.length === 0) {
-                alert('Não há dados cadastrados para exportar no PDF.');
-                return;
-            }
-
+            if (!cache.length) { alert('Não há dados para exportar.'); return; }
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'landscape' });
+            doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(99, 69, 44);
+            doc.text("Relatório Organizado - Guilda Anomalia", 14, 12);
+            doc.setFontSize(8); doc.setTextColor(100);
+            doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} | Total: ${cache.length}`, 14, 18);
 
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(16);
-            doc.setTextColor(99, 69, 44);
-            doc.text("Relatório Completo - Guilda Anomalia", 14, 15);
-
-            doc.setFontSize(9);
-            doc.setTextColor(100, 100, 100);
-            const dataAtual = new Date().toLocaleDateString('pt-BR');
-            const totalMembros = membrosCache.length;
-            let totalProscritos = membrosCache.filter(m => classesProscritos.includes(m.char_class)).length;
-            let totalClas = totalMembros - totalProscritos;
-
-            doc.text(`Data: ${dataAtual} | Total: ${totalMembros} (Clãs: ${totalClas} | Proscritos: ${totalProscritos})`, 14, 21);
-
-            const tableRows = membrosCache.map(m => {
-                const ampT5 = m.amp_t5 || '-';
-                const ampCalor = m.amp_calor || '-';
-                const ampPvp = m.amp_pvp || '-';
-
-                const anel1 = m.anel1 || 'Não tenho';
-                const anel2 = m.anel2 || 'Não tenho';
-                const brac1 = m.brac1 || 'Não tenho';
-                const brac2 = m.brac2 || 'Não tenho';
-                const amuVal = m.amu || 'Não tenho';
-                const capaVal = m.capa || 'Não tenho';
-
-                const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
-                
-                return [
-                    m.char_name || '-',
-                    m.char_class || '-',
-                    m.talentos_35k || '-',
-                    m.almahad_branch || '-',
-                    m.char_level || '-',
-                    m.almahad_t5 || '-',
-                    m.full_branches || '-',
-                    ampT5,
-                    ampCalor,
-                    ampPvp,
-                    anel1,
-                    anel2,
-                    brac1,
-                    brac2,
-                    amuVal,
-                    capaVal,
-                    dataFormatada
-                ];
-            });
+            const rows = cache.map(m => [
+                m.char_name || '-', m.char_class || '-', m.talentos_35k || '-', m.almahad_branch || '-', 
+                m.char_level || '-', m.almahad_t5 || '-', m.full_branches || '-',
+                extrairTextoPdf(m.set_helmet_pvp), extrairTextoPdf(m.set_chest_pvp), extrairTextoPdf(m.set_gloves_pvp), extrairTextoPdf(m.set_boots_pvp), extrairTextoPdf(m.acc_bracelete1_pvp), extrairTextoPdf(m.acc_anel1_pvp), extrairTextoPdf(m.acc_amuleto_pvp), extrairTextoPdf(m.acc_capa_pvp), extrairTextoPdf(m.weapon_pvp1),
+                extrairTextoPdf(m.set_helmet_pve), extrairTextoPdf(m.set_chest_pve), extrairTextoPdf(m.set_gloves_pve), extrairTextoPdf(m.set_boots_pve), extrairTextoPdf(m.acc_bracelete1_pve), extrairTextoPdf(m.acc_anel1_pve), extrairTextoPdf(m.acc_amuleto_pve), extrairTextoPdf(m.acc_capa_pve), extrairTextoPdf(m.weapon_t5),
+                m.has_catacumba ? (m.catacumba_type || 'Sim') : 'Não',
+                m.has_mermem ? (m.mermem_type || 'Sim') : 'Não',
+                m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-'
+            ]);
 
             doc.autoTable({
-                startY: 25,
-                head: [['Personagem', 'Classe', 'Tal 35k', 'Ramo', 'Nível', 'T5', 'Full', 'Arma T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amu', 'Capa', 'Data']],
-                body: tableRows,
-                headStyles: {
-                    fillColor: [41, 28, 19],
-                    textColor: [212, 175, 55],
-                    fontStyle: 'bold',
-                    halign: 'center'
-                },
-                bodyStyles: {
-                    textColor: [50, 50, 50],
-                    fontSize: 7,
-                    halign: 'center'
-                },
-                columnStyles: {
-                    0: { halign: 'left', fontStyle: 'bold' },
-                    1: { halign: 'left' }
-                },
-                alternateRowStyles: {
-                    fillColor: [245, 240, 235]
-                },
-                margin: { horizontal: 10 }
+                startY: 22,
+                head: [[
+                    'Personagem', 'Classe', 'Tal 35k', 'Ramo', 'Nível', 'T5', 'Full', 
+                    'Elmo PvP', 'Peito PvP', 'Luva PvP', 'Bota PvP', 'Brac PvP', 'Anel PvP', 'Amu PvP', 'Capa PvP', 'Arma PvP', 
+                    'Elmo PvE', 'Peito PvE', 'Luva PvE', 'Bota PvE', 'Brac PvE', 'Anel PvE', 'Amu PvE', 'Capa PvE', 'Arma T5', 
+                    'Catacumba', 'Mermem', 'Data'
+                ]],
+                body: rows,
+                headStyles: { fillColor: [41, 28, 19], textColor: [212, 175, 55], fontStyle: 'bold', halign: 'center' },
+                bodyStyles: { textColor: [50, 50, 50], fontSize: 4.5, halign: 'center' },
+                columnStyles: { 0: { halign: 'left', fontStyle: 'bold' }, 1: { halign: 'left' } },
+                alternateRowStyles: { fillColor: [245, 240, 235] },
+                margin: { horizontal: 5 }
             });
-
-            doc.save("relatorio-guilda-anomalia.pdf");
+            doc.save("relatorio-organizado-guilda-anomalia.pdf");
         }
+
+        _supabase
+          .channel('realtime-guild-members-admin')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'guild_members' }, () => {
+              carregarMembros();
+          })
+          .subscribe();
 
         carregarMembros();
     </script>

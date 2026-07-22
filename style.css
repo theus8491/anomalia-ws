@@ -31,8 +31,18 @@ body {
 ::-webkit-scrollbar-thumb {
     background: #422b17;
     border-radius: 4px;
+    border: 1px solid #63452c;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: #d97706;
+}
+
+/* Efeitos de transição e foco para inputs e selects */
+select, input {
+    transition: all 0.2s ease-in-out;
+}
+
+select:focus, input:focus {
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.2);
 }
