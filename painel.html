@@ -34,7 +34,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between selection:bg-amber-600 selection:text-white p-4">
 
-    <main class="w-full max-w-7xl mx-auto space-y-6 my-auto">
+    <main class="w-full max-w-[95%] mx-auto space-y-6 my-auto">
         
         <!-- HEADER DO PAINEL -->
         <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -91,24 +91,29 @@
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="border-b border-[#352214] text-amber-500 font-rpg">
-                            <th class="py-3 px-3">Personagem</th>
-                            <th class="py-3 px-3">Classe</th>
-                            <th class="py-3 px-3 text-center">T5</th>
-                            <th class="py-3 px-3 text-center">Map 5</th>
-                            <th class="py-3 px-3 text-center">PvP</th>
-                            <th class="py-3 px-3 text-center">Anel 1</th>
-                            <th class="py-3 px-3 text-center">Anel 2</th>
-                            <th class="py-3 px-3 text-center">Brac 1</th>
-                            <th class="py-3 px-3 text-center">Brac 2</th>
-                            <th class="py-3 px-3 text-center">Amulet</th>
-                            <th class="py-3 px-3 text-center">Capa</th>
-                            <th class="py-3 px-3 text-center">Data</th>
-                            <th class="py-3 px-3 text-center">Ações</th>
+                            <th class="py-3 px-2">Personagem</th>
+                            <th class="py-3 px-2">Classe</th>
+                            <th class="py-3 px-2 text-center">Talentos 35k</th>
+                            <th class="py-3 px-2 text-center">Ramo Almahad</th>
+                            <th class="py-3 px-2 text-center">Nível</th>
+                            <th class="py-3 px-2 text-center">T5</th>
+                            <th class="py-3 px-2 text-center">Ramos Full</th>
+                            <th class="py-3 px-2 text-center">Arma T5</th>
+                            <th class="py-3 px-2 text-center">Map 5</th>
+                            <th class="py-3 px-2 text-center">PvP</th>
+                            <th class="py-3 px-2 text-center">Anel 1</th>
+                            <th class="py-3 px-2 text-center">Anel 2</th>
+                            <th class="py-3 px-2 text-center">Brac 1</th>
+                            <th class="py-3 px-2 text-center">Brac 2</th>
+                            <th class="py-3 px-2 text-center">Amulet</th>
+                            <th class="py-3 px-2 text-center">Capa</th>
+                            <th class="py-3 px-2 text-center">Data</th>
+                            <th class="py-3 px-2 text-center">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaMembros" class="divide-y divide-[#291c13] text-amber-100">
                         <tr>
-                            <td colspan="13" class="py-6 text-center text-amber-600 italic">Carregando heróis da guilda...</td>
+                            <td colspan="18" class="py-6 text-center text-amber-600 italic">Carregando heróis da guilda...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -123,6 +128,7 @@
     </footer>
 
     <script>
+        // Credenciais Corretas do Supabase
         const SUPABASE_URL = 'https://krabfzjnejvpatufolma.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_VIh6KfT200rJ28XySTS71g_w0tIO4s5';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -134,68 +140,48 @@
             const statusEl = document.getElementById('statusMensagem');
             statusEl.textContent = 'Buscando dados no Supabase...';
 
-            const { data, error } = await _supabase
-                .from('membros')
-                .select('*')
-                .order('created_at', { ascending: false });
+            try {
+                const { data, error } = await _supabase
+                    .from('guild_members')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-            if (error) {
+                if (error) throw error;
+
+                statusEl.textContent = '';
+                membrosCache = data || [];
+                renderizarTabela(membrosCache);
+            } catch (error) {
                 console.error("Erro ao carregar do Supabase:", error.message);
                 statusEl.textContent = 'Erro ao carregar: ' + error.message;
-                return;
             }
-
-            statusEl.textContent = '';
-            membrosCache = data || [];
-            renderizarTabela(membrosCache);
         }
 
-        // Verifica se o valor indica que não tem o item
         function ehNaoTenho(val) {
             if (val === undefined || val === null) return true;
             if (typeof val === 'boolean') return !val;
             
             const lower = String(val).toLowerCase().trim();
-            if (['nao tenho', 'não tenho', 'nao_tenho', 'false', '-', '', 'não', 'nao'].includes(lower)) {
+            if (['nao tenho', 'não tenho', 'nao_tenho', 'false', '-', '', 'não', 'nao', '+0 (sem amp)'].includes(lower)) {
                 return true;
             }
             return false;
         }
 
-        // Exibe exatamente o texto escolhido no select
-        function formatarValorAmp(valor) {
-            if (valor === undefined || valor === null || valor === '') return '-';
-            const str = String(valor).trim();
-            if (ehNaoTenho(str)) return 'Não tenho';
-            return str;
+        function pegarArmaInfo(m, nomeArma, campo) {
+            if (!m) return '-';
+            if (m.weapons && m.weapons[nomeArma]) {
+                return m.weapons[nomeArma][campo] ?? '-';
+            }
+            return '-';
         }
 
-        // Recupera o valor priorizando a coluna direta do banco
-        function pegarValorAcessorio(m, chaveAcessorio, indexFallback) {
-            if (!m) return 'Não tenho';
-
-            // 1. Prioriza a coluna direta da tabela (dados salvos pelo formulário atual)
-            if (m[chaveAcessorio] !== undefined && m[chaveAcessorio] !== null && m[chaveAcessorio] !== '' && String(m[chaveAcessorio]).trim() !== '') {
-                return m[chaveAcessorio];
+        function pegarAcessorioInfo(m, nomeAcc, campo) {
+            if (!m) return '-';
+            if (m.accessories && m.accessories[nomeAcc]) {
+                return m.accessories[nomeAcc][campo] ?? '-';
             }
-
-            // 2. Fallback para JSON antigo caso exista
-            let acc = m.acessorios_estado;
-            if (typeof acc === 'string') {
-                try { acc = JSON.parse(acc); } catch (e) { acc = {}; }
-            }
-
-            if (acc && typeof acc === 'object' && !Array.isArray(acc)) {
-                if (acc[chaveAcessorio] !== undefined && acc[chaveAcessorio] !== null && acc[chaveAcessorio] !== '') {
-                    return acc[chaveAcessorio];
-                }
-            } else if (Array.isArray(acc)) {
-                if (acc[indexFallback] !== undefined && acc[indexFallback] !== null) {
-                    return acc[indexFallback];
-                }
-            }
-
-            return m[chaveAcessorio] || 'Não tenho';
+            return '-';
         }
 
         function renderizarTabela(membros) {
@@ -208,7 +194,7 @@
             let proscritosCount = 0;
 
             if (membros.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" class="py-6 text-center text-amber-600 italic">Nenhum herói cadastrado ainda.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="18" class="py-6 text-center text-amber-600 italic">Nenhum herói cadastrado ainda.</td></tr>`;
                 document.getElementById('totalClas').textContent = 0;
                 document.getElementById('totalProscritos').textContent = 0;
                 return;
@@ -221,42 +207,40 @@
                     clasCount++;
                 }
 
-                const t5    = formatarValorAmp(m.amp_t5);
-                const calor = formatarValorAmp(m.amp_calor);
-                const pvp   = formatarValorAmp(m.amp_pvp);
+                const ampT5 = pegarArmaInfo(m, 'T5', 'amplificacao');
+                const ampCalor = pegarArmaInfo(m, 'Calor', 'amplificacao');
+                const ampPvp = pegarArmaInfo(m, 'Pvp', 'amplificacao');
 
-                const vAnel1 = pegarValorAcessorio(m, 'anel1', 0);
-                const vAnel2 = pegarValorAcessorio(m, 'anel2', 1);
-                const vBrac1 = pegarValorAcessorio(m, 'brac1', 2);
-                const vBrac2 = pegarValorAcessorio(m, 'brac2', 3);
-                const vAmu   = pegarValorAcessorio(m, 'amu', 4);
-                const vCapa  = pegarValorAcessorio(m, 'capa', 5);
-
-                const anel1 = formatarValorAmp(vAnel1);
-                const anel2 = formatarValorAmp(vAnel2);
-                const brac1 = formatarValorAmp(vBrac1);
-                const brac2 = formatarValorAmp(vBrac2);
-                const amu   = formatarValorAmp(vAmu);
-                const capa  = formatarValorAmp(vCapa);
+                const anel1 = pegarAcessorioInfo(m, 'Anel1', 'amplificacao');
+                const anel2 = pegarAcessorioInfo(m, 'Anel2', 'amplificacao');
+                const brac1 = pegarAcessorioInfo(m, 'Bracelete1', 'amplificacao');
+                const brac2 = pegarAcessorioInfo(m, 'Bracelete2', 'amplificacao');
+                const amu = pegarAcessorioInfo(m, 'Amuleto', 'amplificacao');
+                const capa = pegarAcessorioInfo(m, 'Capa', 'amplificacao');
 
                 const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-[#201813] transition';
                 tr.innerHTML = `
-                    <td class="py-3 px-3 font-bold text-amber-200">${m.char_name || 'Desconhecido'}</td>
-                    <td class="py-3 px-3 text-amber-400">${m.char_class || '-'}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_t5) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${t5}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_calor) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${calor}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(m.amp_pvp) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${pvp}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel1}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAnel2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel2}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac1}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vBrac2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac2}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vAmu) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${amu}</td>
-                    <td class="py-3 px-3 text-center ${ehNaoTenho(vCapa) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${capa}</td>
-                    <td class="py-3 px-3 text-center text-amber-600">${dataFormatada}</td>
-                    <td class="py-3 px-3 text-center">
+                    <td class="py-3 px-2 font-bold text-amber-200">${m.char_name || 'Desconhecido'}</td>
+                    <td class="py-3 px-2 text-amber-400">${m.char_class || '-'}</td>
+                    <td class="py-3 px-2 text-center text-amber-300">${m.talentos_35k || '-'}</td>
+                    <td class="py-3 px-2 text-center text-amber-300">${m.almahad_branch || '-'}</td>
+                    <td class="py-3 px-2 text-center text-amber-300">${m.char_level || '-'}</td>
+                    <td class="py-3 px-2 text-center text-amber-300">${m.almahad_t5 || '-'}</td>
+                    <td class="py-3 px-2 text-center text-amber-300">${m.full_branches || '-'}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampT5) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampT5}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampCalor) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampCalor}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(ampPvp) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${ampPvp}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(anel1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel1}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(anel2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${anel2}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(brac1) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac1}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(brac2) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${brac2}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(amu) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${amu}</td>
+                    <td class="py-3 px-2 text-center ${ehNaoTenho(capa) ? 'text-red-400' : 'text-emerald-400 font-bold'}">${capa}</td>
+                    <td class="py-3 px-2 text-center text-amber-600">${dataFormatada}</td>
+                    <td class="py-3 px-2 text-center">
                         <button onclick="excluirMembro('${m.id}')" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-2 py-1 rounded-lg text-xs transition cursor-pointer">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -272,7 +256,7 @@
         async function excluirMembro(id) {
             if (!confirm('Tem certeza que deseja remover este herói da guilda?')) return;
 
-            const { error } = await _supabase.from('membros').delete().eq('id', id);
+            const { error } = await _supabase.from('guild_members').delete().eq('id', id);
             if (error) {
                 alert('Erro ao excluir: ' + error.message);
             } else {
@@ -290,52 +274,57 @@
             const doc = new jsPDF({ orientation: 'landscape' });
 
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(18);
+            doc.setFontSize(16);
             doc.setTextColor(99, 69, 44);
-            doc.text("Relatório Completo de Membros e Equipamentos - Guilda Anomalia", 14, 15);
+            doc.text("Relatório Completo - Guilda Anomalia", 14, 15);
 
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setTextColor(100, 100, 100);
             const dataAtual = new Date().toLocaleDateString('pt-BR');
             const totalMembros = membrosCache.length;
             let totalProscritos = membrosCache.filter(m => classesProscritos.includes(m.char_class)).length;
             let totalClas = totalMembros - totalProscritos;
 
-            doc.text(`Data de Emissão: ${dataAtual} | Total de Membros: ${totalMembros} (Clãs: ${totalClas} | Proscritos: ${totalProscritos})`, 14, 22);
+            doc.text(`Data: ${dataAtual} | Total: ${totalMembros} (Clãs: ${totalClas} | Proscritos: ${totalProscritos})`, 14, 21);
 
             const tableRows = membrosCache.map(m => {
-                const t5Val    = formatarValorAmp(m.amp_t5);
-                const calorVal = formatarValorAmp(m.amp_calor);
-                const pvpVal   = formatarValorAmp(m.amp_pvp);
+                const ampT5 = pegarArmaInfo(m, 'T5', 'amplificacao');
+                const ampCalor = pegarArmaInfo(m, 'Calor', 'amplificacao');
+                const ampPvp = pegarArmaInfo(m, 'Pvp', 'amplificacao');
 
-                const anel1 = formatarValorAmp(pegarValorAcessorio(m, 'anel1', 0));
-                const anel2 = formatarValorAmp(pegarValorAcessorio(m, 'anel2', 1));
-                const brac1 = formatarValorAmp(pegarValorAcessorio(m, 'brac1', 2));
-                const brac2 = formatarValorAmp(pegarValorAcessorio(m, 'brac2', 3));
-                const amu   = formatarValorAmp(pegarValorAcessorio(m, 'amu', 4));
-                const capa  = formatarValorAmp(pegarValorAcessorio(m, 'capa', 5));
+                const anel1 = pegarAcessorioInfo(m, 'Anel1', 'amplificacao');
+                const anel2 = pegarAcessorioInfo(m, 'Anel2', 'amplificacao');
+                const brac1 = pegarAcessorioInfo(m, 'Bracelete1', 'amplificacao');
+                const brac2 = pegarAcessorioInfo(m, 'Bracelete2', 'amplificacao');
+                const amuVal = pegarAcessorioInfo(m, 'Amuleto', 'amplificacao');
+                const capaVal = pegarAcessorioInfo(m, 'Capa', 'amplificacao');
 
                 const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
                 
                 return [
                     m.char_name || '-',
                     m.char_class || '-',
-                    t5Val,
-                    calorVal,
-                    pvpVal,
+                    m.talentos_35k || '-',
+                    m.almahad_branch || '-',
+                    m.char_level || '-',
+                    m.almahad_t5 || '-',
+                    m.full_branches || '-',
+                    ampT5,
+                    ampCalor,
+                    ampPvp,
                     anel1,
                     anel2,
                     brac1,
                     brac2,
-                    amu,
-                    capa,
+                    amuVal,
+                    capaVal,
                     dataFormatada
                 ];
             });
 
             doc.autoTable({
-                startY: 28,
-                head: [['Personagem', 'Classe', 'T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amulet', 'Capa', 'Data']],
+                startY: 25,
+                head: [['Personagem', 'Classe', 'Tal 35k', 'Ramo', '', 'T5', 'Full', 'Arma T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amu', 'Capa', 'Data']],
                 body: tableRows,
                 headStyles: {
                     fillColor: [41, 28, 19],
@@ -345,7 +334,7 @@
                 },
                 bodyStyles: {
                     textColor: [50, 50, 50],
-                    fontSize: 8,
+                    fontSize: 7,
                     halign: 'center'
                 },
                 columnStyles: {
@@ -355,10 +344,10 @@
                 alternateRowStyles: {
                     fillColor: [245, 240, 235]
                 },
-                margin: { horizontal: 14 }
+                margin: { horizontal: 10 }
             });
 
-            doc.save("relatorio-completo-equipamentos-anomalia.pdf");
+            doc.save("relatorio-guilda-anomalia.pdf");
         }
 
         carregarMembros();
