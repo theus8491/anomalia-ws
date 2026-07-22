@@ -1,6 +1,6 @@
-// Inicialização do Supabase (Substitua com suas chaves reais do projeto)
-const SUPABASE_URL = 'SUA_SUPABASE_URL_AQUI';
-const SUPABASE_ANON_KEY = 'SUA_SUPABASE_ANON_KEY_AQUI';
+// Inicialização do Supabase com as credenciais reais do projeto
+const SUPABASE_URL = 'https://krabfzjnejvpatufolma.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_VIh6KfT200rJ28XySTS71g_w0tIO4s5';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Função para atualizar visualmente as estrelas de amplificação
@@ -57,7 +57,7 @@ function toggleAccessory(name) {
     if (noCheckbox.checked) {
         checkCheckbox.checked = false;
         checkCheckbox.disabled = true;
-        select.value = '+0 (Sem amp)';
+        select.value = 'Não tenho';
         select.disabled = true;
         select.classList.add('opacity-50', 'cursor-not-allowed');
     } else {
@@ -91,47 +91,29 @@ function updateCounter() {
 document.getElementById('itemForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Captura de Dados Básicos
-    const charName = document.getElementById('charName').value.trim();
-    const charClass = document.getElementById('charClass').value;
-    const talentos35k = document.querySelector('input[name="talentos35k"]:checked')?.value || '';
-    const almahadBranch = document.getElementById('almahadBranch').value;
-    const charLevel = document.getElementById('charLevel').value;
-    const almahadT5 = document.getElementById('almahadT5').value;
-    const fullBranches = document.getElementById('fullBranches').value;
-
-    // Captura de Armas
-    const weapons = ['T5', 'Calor', 'Pvp'];
-    const weaponData = {};
-    weapons.forEach(w => {
-        weaponData[w] = {
-            nao_tenho: document.getElementById('no' + w).checked,
-            equipado: document.getElementById('check' + w).checked,
-            amplificacao: document.getElementById('amp' + w).value
-        };
-    });
-
-    // Captura de Acessórios
-    const accessories = ['Anel1', 'Anel2', 'Bracelete1', 'Bracelete2', 'Amuleto', 'Capa'];
-    const accessoryData = {};
-    accessories.forEach(acc => {
-        accessoryData[acc] = {
-            nao_tenho: document.getElementById('no' + acc).checked,
-            equipado: document.getElementById('check' + acc).checked,
-            amplificacao: document.getElementById('amp' + acc).value
-        };
-    });
-
+    // Monta o payload mapeando diretamente para as colunas planas da tabela
     const payload = {
-        char_name: charName,
-        char_class: charClass,
-        talentos_35k: talentos35k,
-        almahad_branch: almahadBranch,
-        char_level: charLevel,
-        almahad_t5: almahadT5,
-        full_branches: fullBranches,
-        weapons: weaponData,
-        accessories: accessoryData,
+        char_name: document.getElementById('charName').value.trim(),
+        char_class: document.getElementById('charClass').value,
+        talentos_35k: document.querySelector('input[name="talentos35k"]:checked')?.value || '-',
+        almahad_branch: document.getElementById('almahadBranch').value || '-',
+        char_level: document.getElementById('charLevel').value || '-',
+        almahad_t5: document.getElementById('almahadT5').value || '-',
+        full_branches: document.getElementById('fullBranches').value || '-',
+        
+        // Armas
+        amp_t5: document.getElementById('ampT5').value || '-',
+        amp_calor: document.getElementById('ampCalor').value || '-',
+        amp_pvp: document.getElementById('ampPvp').value || '-',
+        
+        // Acessórios
+        anel1: document.getElementById('ampAnel1').value || 'Não tenho',
+        anel2: document.getElementById('ampAnel2').value || 'Não tenho',
+        brac1: document.getElementById('ampBracelete1').value || 'Não tenho',
+        brac2: document.getElementById('ampBracelete2').value || 'Não tenho',
+        amu: document.getElementById('ampAmuleto').value || 'Não tenho',
+        capa: document.getElementById('ampCapa').value || 'Não tenho',
+        
         created_at: new Date()
     };
 
@@ -142,16 +124,19 @@ document.getElementById('itemForm').addEventListener('submit', async (e) => {
 
         if (error) throw error;
 
-        alert('Credenciais enviadas com sucesso para a Guilda Anomalia!');
+        alert('Herói cadastrado com sucesso para a Guilda Anomalia!');
         document.getElementById('itemForm').reset();
         
         // Reset visual de estrelas e contadores
-        weapons.forEach(w => updateStars('amp' + w, 'stars' + w));
-        accessories.forEach(acc => updateStars('amp' + acc, 'stars' + acc));
+        const weaponsList = ['T5', 'Calor', 'Pvp'];
+        const accessoriesList = ['Anel1', 'Anel2', 'Bracelete1', 'Bracelete2', 'Amuleto', 'Capa'];
+        
+        weaponsList.forEach(w => updateStars('amp' + w, 'stars' + w));
+        accessoriesList.forEach(acc => updateStars('amp' + acc, 'stars' + acc));
         updateCounter();
 
     } catch (error) {
         console.error('Erro ao enviar dados:', error);
-        alert('Erro ao enviar dados para o Supabase. Verifique sua conexão.');
+        alert('Erro ao enviar dados para o Supabase: ' + error.message);
     }
 });

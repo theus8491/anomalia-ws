@@ -168,22 +168,6 @@
             return false;
         }
 
-        function pegarArmaInfo(m, nomeArma, campo) {
-            if (!m) return '-';
-            if (m.weapons && m.weapons[nomeArma]) {
-                return m.weapons[nomeArma][campo] ?? '-';
-            }
-            return '-';
-        }
-
-        function pegarAcessorioInfo(m, nomeAcc, campo) {
-            if (!m) return '-';
-            if (m.accessories && m.accessories[nomeAcc]) {
-                return m.accessories[nomeAcc][campo] ?? '-';
-            }
-            return '-';
-        }
-
         function renderizarTabela(membros) {
             const tbody = document.getElementById('tabelaMembros');
             tbody.innerHTML = '';
@@ -207,16 +191,16 @@
                     clasCount++;
                 }
 
-                const ampT5 = pegarArmaInfo(m, 'T5', 'amplificacao');
-                const ampCalor = pegarArmaInfo(m, 'Calor', 'amplificacao');
-                const ampPvp = pegarArmaInfo(m, 'Pvp', 'amplificacao');
+                const ampT5 = m.amp_t5 || '-';
+                const ampCalor = m.amp_calor || '-';
+                const ampPvp = m.amp_pvp || '-';
 
-                const anel1 = pegarAcessorioInfo(m, 'Anel1', 'amplificacao');
-                const anel2 = pegarAcessorioInfo(m, 'Anel2', 'amplificacao');
-                const brac1 = pegarAcessorioInfo(m, 'Bracelete1', 'amplificacao');
-                const brac2 = pegarAcessorioInfo(m, 'Bracelete2', 'amplificacao');
-                const amu = pegarAcessorioInfo(m, 'Amuleto', 'amplificacao');
-                const capa = pegarAcessorioInfo(m, 'Capa', 'amplificacao');
+                const anel1 = m.anel1 || 'Não tenho';
+                const anel2 = m.anel2 || 'Não tenho';
+                const brac1 = m.brac1 || 'Não tenho';
+                const brac2 = m.brac2 || 'Não tenho';
+                const amu = m.amu || 'Não tenho';
+                const capa = m.capa || 'Não tenho';
 
                 const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
 
@@ -288,16 +272,16 @@
             doc.text(`Data: ${dataAtual} | Total: ${totalMembros} (Clãs: ${totalClas} | Proscritos: ${totalProscritos})`, 14, 21);
 
             const tableRows = membrosCache.map(m => {
-                const ampT5 = pegarArmaInfo(m, 'T5', 'amplificacao');
-                const ampCalor = pegarArmaInfo(m, 'Calor', 'amplificacao');
-                const ampPvp = pegarArmaInfo(m, 'Pvp', 'amplificacao');
+                const ampT5 = m.amp_t5 || '-';
+                const ampCalor = m.amp_calor || '-';
+                const ampPvp = m.amp_pvp || '-';
 
-                const anel1 = pegarAcessorioInfo(m, 'Anel1', 'amplificacao');
-                const anel2 = pegarAcessorioInfo(m, 'Anel2', 'amplificacao');
-                const brac1 = pegarAcessorioInfo(m, 'Bracelete1', 'amplificacao');
-                const brac2 = pegarAcessorioInfo(m, 'Bracelete2', 'amplificacao');
-                const amuVal = pegarAcessorioInfo(m, 'Amuleto', 'amplificacao');
-                const capaVal = pegarAcessorioInfo(m, 'Capa', 'amplificacao');
+                const anel1 = m.anel1 || 'Não tenho';
+                const anel2 = m.anel2 || 'Não tenho';
+                const brac1 = m.brac1 || 'Não tenho';
+                const brac2 = m.brac2 || 'Não tenho';
+                const amuVal = m.amu || 'Não tenho';
+                const capaVal = m.capa || 'Não tenho';
 
                 const dataFormatada = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '-';
                 
@@ -324,7 +308,7 @@
 
             doc.autoTable({
                 startY: 25,
-                head: [['Personagem', 'Classe', 'Tal 35k', 'Ramo', '', 'T5', 'Full', 'Arma T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amu', 'Capa', 'Data']],
+                head: [['Personagem', 'Classe', 'Tal 35k', 'Ramo', 'Nível', 'T5', 'Full', 'Arma T5', 'Map 5', 'PvP', 'Anel 1', 'Anel 2', 'Brac 1', 'Brac 2', 'Amu', 'Capa', 'Data']],
                 body: tableRows,
                 headStyles: {
                     fillColor: [41, 28, 19],
