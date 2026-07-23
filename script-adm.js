@@ -4,6 +4,8 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const proscritos = ['Necromante', 'Cavaleiro da Morte', 'Bruxo', 'Encantador', 'Ceifador'];
 let cache = [];
 let pvpsExpandidos = {}; 
+let chartClassesInstance = null;
+let chartParticipacaoInstance = null;
 
 const rawPtsStorage = JSON.parse(localStorage.getItem('guilda_anomalia_pts')) || {
     1: { slots: [null, null, null, null, null], modo: 'normal' },
@@ -22,35 +24,169 @@ const salvarPtsStorage = () => localStorage.setItem('guilda_anomalia_pts', JSON.
 
 async function mudarAba(aba) {
     const isMembros = aba === 'membros';
+    const isPts = aba === 'pts';
+    const isStats = aba === 'stats';
+
     document.getElementById('btnTabMembros').className = isMembros ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
-    document.getElementById('btnTabPts').className = !isMembros ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    document.getElementById('btnTabPts').className = isPts ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    document.getElementById('btnTabStats').className = isStats ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+
     document.getElementById('tabMembros').classList.toggle('hidden', !isMembros);
-    document.getElementById('tabPts').classList.toggle('hidden', isMembros);
-    if (!isMembros && cache.length === 0) await carregarMembros();
-    else if (!isMembros) renderPts();
+    document.getElementById('tabPts').classList.toggle('hidden', !isPts);
+    document.getElementById('tabStats').classList.toggle('hidden', !isStats);
+
+    if (cache.length === 0) {
+        await carregarMembros();
+    } else {
+        if (isPts) renderPts();
+        if (isStats) renderStats();
+    }
 }
 
 async function carregarMembros() {
     document.getElementById('statusMensagem').textContent = 'Buscando dados...';
-    const { data, error } = await _supabase.from('guild_members').select('*').order('created_at', { ascending: false });
-    if (error) { document.getElementById('statusMensagem').textContent = 'Erro: ' + error.message; return; }
+    
+    let allData = [];
+    let page = 0;
+    const pageSize = 50; // Busca em lotes seguros para evitar limites do servidor Supabase
+    let fetching = true;
+
+    while (fetching) {
+        const { data, error } = await _supabase
+            .from('guild_members')
+            .select('*')
+            .range(page * pageSize, (page + 1) * pageSize - 1)
+            .order('created_at', { ascending: false });
+
+        if (error) { 
+            document.getElementById('statusMensagem').textContent = 'Erro: ' + error.message; 
+            return; 
+        }
+
+        if (data && data.length > 0) {
+            allData = allData.concat(data);
+            if (data.length < pageSize) {
+                fetching = false; // Encontrou o fim dos registros
+            } else {
+                page++;
+            }
+        } else {
+            fetching = false;
+        }
+    }
+
     document.getElementById('statusMensagem').textContent = '';
-    cache = data || [];
-    renderResumoClasses(cache);
-    const filtro = document.getElementById('filtroClasse').value;
-    const busca = document.getElementById('buscaNome').value.toLowerCase().trim();
-    render(cache.filter(m => (filtro === 'todos' || m.char_class === filtro) && (!busca || (m.char_name || '').toLowerCase().includes(busca))));
+    cache = allData;
+    aplicarFiltros();
     if (!document.getElementById('tabPts').classList.contains('hidden')) renderPts();
+    if (!document.getElementById('tabStats').classList.contains('hidden')) renderStats();
 }
 
-const filtrarPorClasse = (classe) => { document.getElementById('filtroClasse').value = classe; carregarMembros(); };
+function renderStats() {
+    if (!cache.length) return;
+
+    const catacumbaCount = cache.filter(m => m.has_catacumba).length;
+    const catacumbaNao = cache.length - catacumbaCount;
+    const mermemCount = cache.filter(m => m.has_mermem).length;
+    const mermemNao = cache.length - mermemCount;
+
+    const elCat = document.getElementById('statCatacumba');
+    const elMer = document.getElementById('statMermem');
+    if (elCat) elCat.textContent = catacumbaCount;
+    if (elMer) elMer.textContent = mermemCount;
+
+    const counts = cache.reduce((acc, curr) => { 
+        acc[curr.char_class || 'Outros'] = (acc[curr.char_class || 'Outros'] || 0) + 1; 
+        return acc; 
+    }, {});
+
+    const labelsClasses = Object.keys(counts);
+    const dataClasses = Object.values(counts);
+
+    const coresClasses = [
+        '#d97706', '#eab308', '#22c55e', '#3b82f6', '#ef4444', 
+        '#f97316', '#a855f7', '#06b6d4', '#84cc16', '#ec4899', '#14b8a6', '#64748b'
+    ];
+
+    const ctxClasses = document.getElementById('chartClasses')?.getContext('2d');
+    if (ctxClasses) {
+        if (chartClassesInstance) chartClassesInstance.destroy();
+        chartClassesInstance = new Chart(ctxClasses, {
+            type: 'doughnut',
+            data: {
+                labels: labelsClasses,
+                datasets: [{
+                    data: dataClasses,
+                    backgroundColor: coresClasses.slice(0, labelsClasses.length),
+                    borderWidth: 2,
+                    borderColor: '#1a1410',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#fde68a', font: { family: 'serif', size: 11 }, boxWidth: 14, padding: 12 }
+                    }
+                }
+            }
+        });
+    }
+
+    const ctxPart = document.getElementById('chartParticipacao')?.getContext('2d');
+    if (ctxPart) {
+        if (chartParticipacaoInstance) chartParticipacaoInstance.destroy();
+        chartParticipacaoInstance = new Chart(ctxPart, {
+            type: 'bar',
+            data: {
+                labels: ['Catacumba', 'Mermem'],
+                datasets: [
+                    { label: 'Sim', data: [catacumbaCount, mermemCount], backgroundColor: '#10b981', borderRadius: 6 },
+                    { label: 'Não', data: [catacumbaNao, mermemNao], backgroundColor: '#ef4444', borderRadius: 6 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { color: '#fde68a', font: { family: 'serif', size: 11 } } }
+                },
+                scales: {
+                    x: { ticks: { color: '#fde68a', font: { family: 'serif', size: 12 } }, grid: { color: '#291c13' } },
+                    y: { ticks: { color: '#fde68a', precision: 0 }, grid: { color: '#291c13' } }
+                }
+            }
+        });
+    }
+}
+
+function aplicarFiltros() {
+    const filtroEl = document.getElementById('filtroClasse');
+    const buscaEl = document.getElementById('buscaNome');
+    const filtro = filtroEl ? filtroEl.value : 'todos';
+    const busca = buscaEl ? buscaEl.value.toLowerCase().trim() : '';
+
+    renderResumoClasses(cache);
+    render(cache.filter(m => (filtro === 'todos' || m.char_class === filtro) && (!busca || (m.char_name || '').toLowerCase().includes(busca))));
+}
+
+const filtrarPorClasse = (classe) => { 
+    const filtroEl = document.getElementById('filtroClasse');
+    if (!filtroEl) return;
+    filtroEl.value = (filtroEl.value === classe) ? 'todos' : classe;
+    aplicarFiltros(); 
+};
 
 function renderResumoClasses(dados) {
     const container = document.getElementById('adminClassSummary');
     if (!container) return;
     if (!dados.length) { container.innerHTML = '<span class="text-amber-500/60 text-xs col-span-full">Nenhum herói cadastrado.</span>'; return; }
     const counts = dados.reduce((acc, curr) => { acc[curr.char_class || 'Outros'] = (acc[curr.char_class || 'Outros'] || 0) + 1; return acc; }, {});
-    const filtroAtual = document.getElementById('filtroClasse').value;
+    const filtroEl = document.getElementById('filtroClasse');
+    const filtroAtual = filtroEl ? filtroEl.value : 'todos';
 
     container.innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([cls, total]) => {
         const isSel = filtroAtual === cls;
@@ -68,11 +204,6 @@ function formatItem(itemObj) {
     if (itemObj.nivel && itemObj.nivel !== '-') res.push(`<span class="text-emerald-400">Nvl ${itemObj.nivel}</span>`);
     return res.length ? res.join(' ') : '<span class="text-emerald-400 font-bold">Equipado</span>';
 }
-
-const formatItemPrevia = (nome, obj) => {
-    const naoTem = !obj || obj.nao_tem || (typeof obj === 'string' && ['não tenho', 'nao tenho', '-', ''].includes(obj.toLowerCase()));
-    return `<div class="flex justify-between bg-[#130f0d] px-2 py-1 rounded text-[10px] border ${naoTem ? 'border-red-950/20 text-red-400' : 'border-purple-900/30 text-amber-200'}"><span class="text-amber-500/80">${nome}:</span> <span>${formatItem(obj)}</span></div>`;
-};
 
 const badgeItem = (nome, obj, isPvp) => {
     const naoTem = !obj || obj.nao_tem || (typeof obj === 'string' && ['não tenho', 'nao tenho', '-', ''].includes(obj.toLowerCase()));
@@ -202,6 +333,11 @@ function renderPts() {
             const itensDet = mapItens[modo] || [];
             const corTema = modo === 'gvg' ? 'purple' : 'emerald';
             
+            const formatItemPrevia = (nome, obj) => {
+                const naoTem = !obj || obj.nao_tem || (typeof obj === 'string' && ['não tenho', 'nao tenho', '-', ''].includes(obj.toLowerCase()));
+                return `<div class="flex justify-between bg-[#130f0d] px-2 py-1 rounded text-[10px] border ${naoTem ? 'border-red-950/20 text-red-400' : 'border-purple-900/30 text-amber-200'}"><span class="text-amber-500/80">${nome}:</span> <span>${formatItem(obj)}</span></div>`;
+            };
+
             let detalhesHtml = isExp && modo !== 'normal' ? `
                 <div class="mt-2 pt-2 border-t border-${corTema}-900/40 grid grid-cols-1 gap-1.5 bg-${corTema}-950/20 p-2 rounded-lg text-[10px]">
                     <div class="text-${corTema}-300 font-bold font-rpg mb-0.5"><i class="fa-solid fa-shield-halved"></i> Set ${nomesModos[modo]} (${m.char_name}):</div>
@@ -315,22 +451,6 @@ function gerarPDFPts() {
             headStyles: { fillColor: [41, 28, 19], textColor: [212, 175, 55], fontStyle: 'bold', cellPadding: 1.5 },
             bodyStyles: { fontSize: 6.5, cellPadding: 1.5 },
             columnStyles: { 0: { cellWidth: 8, halign: 'center', fontStyle: 'bold' }, 1: { cellWidth: 36, halign: 'left' }, 2: { cellWidth: 28, halign: 'center' } },
-            didParseCell: function (data) {
-                if (data.section === 'body') {
-                    const slotColors = [
-                        { fill: [218, 218, 218], text: [40, 40, 40] },
-                        { fill: [200, 230, 205], text: [30, 60, 30] },
-                        { fill: [210, 175, 150], text: [60, 30, 20] },
-                        { fill: [185, 205, 230], text: [20, 40, 60] },
-                        { fill: [242, 228, 160], text: [60, 50, 20] }
-                    ];
-                    if (slotColors[data.row.index]) {
-                        data.cell.styles.fillColor = slotColors[data.row.index].fill;
-                        data.cell.styles.textColor = slotColors[data.row.index].text;
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                }
-            },
             margin: { left: startX, right: 297 - (startX + colWidth) }
         });
 
@@ -383,5 +503,323 @@ function gerarPDF() {
     doc.save("relatorio-guilda-anomalia.pdf");
 }
 
+function gerarPDFEstatisticas() {
+    if (!cache.length) { alert('Não há dados para gerar o PDF de estatísticas.'); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    // Cabeçalho
+    doc.setFont("helvetica", "bold"); 
+    doc.setFontSize(16); 
+    doc.setTextColor(99, 69, 44);
+    doc.text("Relatório Estatístico - Guilda Anomalia", 14, 15);
+
+    doc.setFontSize(9); 
+    doc.setTextColor(100);
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')} | Total de Membros: ${cache.length}`, 14, 21);
+
+    // Contagem por Classe (Texto organizado em colunas)
+    doc.setFontSize(11);
+    doc.setTextColor(99, 69, 44);
+    doc.text("Contagem por Classe:", 14, 29);
+
+    const counts = cache.reduce((acc, curr) => { 
+        acc[curr.char_class || 'Outros'] = (acc[curr.char_class || 'Outros'] || 0) + 1; 
+        return acc; 
+    }, {});
+
+    const sortedClasses = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    
+    doc.setFontSize(8.5);
+    doc.setTextColor(60, 60, 60);
+    let startX = 14;
+    let startY = 35;
+    let colWidth = 65;
+    let maxRowsPerCol = 4;
+    
+    sortedClasses.forEach(([cls, total], index) => {
+        let colIndex = Math.floor(index / maxRowsPerCol);
+        let rowIndex = index % maxRowsPerCol;
+        let x = startX + (colIndex * colWidth);
+        let y = startY + (rowIndex * 5.5);
+        doc.text(`• ${cls}: ${total} herói(is)`, x, y);
+    });
+
+    let nextY = startY + (Math.min(maxRowsPerCol, sortedClasses.length) * 5.5) + 4;
+
+    // --- CONTABILIZAÇÃO DE CATACUMBA E MERMEM ---
+    const catacumbaCount = cache.filter(m => m.has_catacumba).length;
+    const catacumbaNao = cache.length - catacumbaCount;
+    const mermemCount = cache.filter(m => m.has_mermem).length;
+    const mermemNao = cache.length - mermemCount;
+
+    doc.setFontSize(11);
+    doc.setTextColor(99, 69, 44);
+    doc.text("Participação em Eventos:", 14, nextY);
+
+    doc.setFontSize(8.5);
+    doc.setTextColor(60, 60, 60);
+    doc.text(`• Catacumba: ${catacumbaCount} Sim / ${catacumbaNao} Não`, 14, nextY + 6);
+    doc.text(`• Mermem: ${mermemCount} Sim / ${mermemNao} Não`, 80, nextY + 6);
+
+    nextY += 14;
+
+    // Títulos dos Gráficos
+    doc.setFontSize(11);
+    doc.setTextColor(99, 69, 44);
+    doc.text("Distribuição de Classes", 14, nextY);
+    doc.text("Status de Catacumba e Mermem", 110, nextY);
+
+    // Inserir os gráficos capturados do Chart.js (Rosca e Barras)
+    const canvasClasses = document.getElementById('chartClasses');
+    const canvasPart = document.getElementById('chartParticipacao');
+
+    if (canvasClasses && canvasPart) {
+        const imgClasses = canvasClasses.toDataURL('image/png', 1.0);
+        const imgPart = canvasPart.toDataURL('image/png', 1.0);
+
+        doc.addImage(imgClasses, 'PNG', 14, nextY + 3, 88, 65);
+        doc.addImage(imgPart, 'PNG', 110, nextY + 3, 88, 65);
+    }
+
+    // --- LISTAGEM COMPLETA DE TODOS OS MEMBROS NO PDF DE ESTATÍSTICAS ---
+    doc.addPage();
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(99, 69, 44);
+    doc.text("Relação Completa de Membros (Estatísticas)", 14, 15);
+
+    const membrosRows = cache.map((m, idx) => [
+        idx + 1,
+        m.char_name || '-',
+        m.char_class || '-',
+        m.char_level || '-',
+        m.has_catacumba ? (m.catacumba_type || 'Sim') : 'Não',
+        m.has_mermem ? (m.mermem_type || 'Sim') : 'Não'
+    ]);
+
+    doc.autoTable({
+        startY: 20,
+        head: [['#', 'Herói', 'Classe', 'Nível', 'Catacumba', 'Mermem']],
+        body: membrosRows,
+        headStyles: { fillColor: [41, 28, 19], textColor: [212, 175, 55], fontStyle: 'bold', halign: 'center', fontSize: 8 },
+        bodyStyles: { textColor: [40, 40, 40], fontSize: 8, halign: 'center' },
+        columnStyles: { 0: { cellWidth: 12, halign: 'center' }, 1: { halign: 'left', fontStyle: 'bold' }, 2: { halign: 'left' } },
+        alternateRowStyles: { fillColor: [248, 245, 240] },
+        margin: { horizontal: 14 }
+    });
+
+    // Rodapé de páginas
+    const pages = doc.internal.getNumberOfPages();
+    for(let i = 1; i <= pages; i++) {
+        doc.setPage(i); 
+        doc.setFontSize(7.5); 
+        doc.setTextColor(150);
+        doc.text(`Página ${i} de ${pages}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: 'center' });
+    }
+
+    doc.save("estatisticas-guilda-anomalia.pdf");
+}
+
 _supabase.channel('realtime-guild-members-admin').on('postgres_changes', { event: '*', schema: 'public', table: 'guild_members' }, () => carregarMembros()).subscribe();
 carregarMembros();
+
+// --- SISTEMA DE CONTROLE DE PRESENÇA ---
+
+function obterSemanaAno() {
+    const agora = new Date();
+    const inicioAno = new Date(agora.getFullYear(), 0, 1);
+    const dias = Math.floor((agora - inicioAno) / (24 * 60 * 60 * 1000));
+    return Math.ceil((dias + inicioAno.getDay() + 1) / 7);
+}
+
+function obterDadosPresencaStorage() {
+    let dadosSalvos = JSON.parse(localStorage.getItem('guilda_anomalia_presenca')) || {};
+    const semanaAtual = obterSemanaAno();
+
+    if (dadosSalvos.semana !== semanaAtual) {
+        dadosSalvos = { semana: semanaAtual, registros: {} };
+        localStorage.setItem('guilda_anomalia_presenca', JSON.stringify(dadosSalvos));
+    }
+    return dadosSalvos;
+}
+
+function salvarDadosPresencaStorage(dados) {
+    localStorage.setItem('guilda_anomalia_presenca', JSON.stringify(dados));
+}
+
+// Substitua ou atualize sua função mudarAba existente com esta versão:
+async function mudarAba(aba) {
+    const isMembros = aba === 'membros';
+    const isPts = aba === 'pts';
+    const isStats = aba === 'stats';
+    const isPresenca = aba === 'presenca';
+
+    document.getElementById('btnTabMembros').className = isMembros ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    document.getElementById('btnTabPts').className = isPts ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    document.getElementById('btnTabStats').className = isStats ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    
+    const btnPresenca = document.getElementById('btnTabPresenca');
+    if (btnPresenca) {
+        btnPresenca.className = isPresenca ? "bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2" : "bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2";
+    }
+
+    document.getElementById('tabMembros').classList.toggle('hidden', !isMembros);
+    document.getElementById('tabPts').classList.toggle('hidden', !isPts);
+    document.getElementById('tabStats').classList.toggle('hidden', !isStats);
+    
+    const tabPresenca = document.getElementById('tabPresenca');
+    if (tabPresenca) tabPresenca.classList.toggle('hidden', !isPresenca);
+
+    if (cache.length === 0) {
+        await carregarMembros();
+    } else {
+        if (isPts && typeof renderPts === 'function') renderPts();
+        if (isStats && typeof renderStats === 'function') renderStats();
+        if (isPresenca) renderPresenca();
+    }
+}
+
+function alternarSlotPresenca(membroId, slotIndex) {
+    let dadosPresenca = obterDadosPresencaStorage();
+    if (!dadosPresenca.registros[membroId]) {
+        dadosPresenca.registros[membroId] = [null, null, null, null, null, null, null];
+    }
+
+    const atual = dadosPresenca.registros[membroId][slotIndex];
+    let proximo = null;
+
+    if (atual === null) proximo = 'ok';
+    else if (atual === 'ok') proximo = 'falta';
+    else if (atual === 'falta') proximo = 'justificou';
+    else if (atual === 'justificou') proximo = null;
+
+    dadosPresenca.registros[membroId][slotIndex] = proximo;
+    salvarDadosPresencaStorage(dadosPresenca);
+    renderPresenca();
+}
+
+function resetarPresenca() {
+    if (!confirm('Deseja realmente limpar todos os registros de presença desta semana?')) return;
+    let dadosPresenca = obterDadosPresencaStorage();
+    dadosPresenca.registros = {};
+    salvarDadosPresencaStorage(dadosPresenca);
+    renderPresenca();
+}
+
+function renderPresenca() {
+    const tbody = document.getElementById('tabelaPresencaCorpo');
+    if (!tbody) return;
+
+    if (!cache.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-amber-600 italic">Nenhum herói encontrado.</td></tr>`;
+        return;
+    }
+
+    let dadosPresenca = obterDadosPresencaStorage();
+
+    tbody.innerHTML = cache.map(m => {
+        const slots = dadosPresenca.registros[m.id] || [null, null, null, null, null, null, null];
+        
+        let countOk = slots.filter(s => s === 'ok').length;
+        let countFalta = slots.filter(s => s === 'falta').length;
+        let countJust = slots.filter(s => s === 'justificou').length;
+
+        let slotsHtml = slots.map((estado, idx) => {
+            let bgClass = "bg-[#130f0d] border-[#352214] text-transparent hover:border-amber-500";
+            let texto = "";
+
+            if (estado === 'ok') {
+                bgClass = "bg-emerald-950/80 border-emerald-600 text-emerald-300 font-bold";
+                texto = "✔";
+            } else if (estado === 'falta') {
+                bgClass = "bg-red-950/80 border-red-600 text-red-300 font-bold";
+                texto = "X";
+            } else if (estado === 'justificou') {
+                bgClass = "bg-amber-950/80 border-amber-600 text-amber-300 font-bold text-[10px]";
+                texto = "Just";
+            }
+
+            return `
+                <td class="p-1.5 text-center">
+                    <button onclick="alternarSlotPresenca('${m.id}', ${idx})" class="w-8 h-8 rounded-lg border flex items-center justify-center transition cursor-pointer mx-auto ${bgClass}" title="Clique para alternar status">
+                        ${texto}
+                    </button>
+                </td>
+            `;
+        }).join('');
+
+        return `
+            <tr class="hover:bg-[#201813]/50 transition">
+                <td class="p-2.5 font-bold text-amber-100">${m.char_name || '-'}</td>
+                <td class="p-2.5 text-amber-400 text-xs">${m.char_class || '-'}</td>
+                ${slotsHtml}
+                <td class="p-2.5 text-center text-[11px] font-semibold">
+                    <span class="text-emerald-400" title="Presenças">${countOk}</span> / 
+                    <span class="text-red-400" title="Faltas">${countFalta}</span> / 
+                    <span class="text-amber-400" title="Justificadas">${countJust}</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function gerarPDFPresenca() {
+    if (!cache.length) { alert('Não há dados para gerar o PDF de presença.'); return; }
+    let dadosPresenca = obterDadosPresencaStorage();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    doc.setFont("helvetica", "bold"); 
+    doc.setFontSize(14); 
+    doc.setTextColor(99, 69, 44);
+    doc.text("Controle de Presença Semanal - Guilda Anomalia", 14, 15);
+
+    doc.setFontSize(8); 
+    doc.setTextColor(100);
+    doc.text(`Semana do Ano: ${dadosPresenca.semana} | Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 14, 20);
+
+    const rows = cache.map((m, idx) => {
+        const slots = dadosPresenca.registros[m.id] || [null, null, null, null, null, null, null];
+        const formatarSlotPdf = (s) => s === 'ok' ? 'OK' : s === 'falta' ? 'Falta (X)' : s === 'justificou' ? 'Justificou' : '-';
+        
+        let cOk = slots.filter(s => s === 'ok').length;
+        let cFalta = slots.filter(s => s === 'falta').length;
+        let cJust = slots.filter(s => s === 'justificou').length;
+
+        return [
+            idx + 1,
+            m.char_name || '-',
+            m.char_class || '-',
+            formatarSlotPdf(slots[0]),
+            formatarSlotPdf(slots[1]),
+            formatarSlotPdf(slots[2]),
+            formatarSlotPdf(slots[3]),
+            formatarSlotPdf(slots[4]),
+            formatarSlotPdf(slots[5]),
+            formatarSlotPdf(slots[6]),
+            `${cOk} OK / ${cFalta} Falta / ${cJust} Just`
+        ];
+    });
+
+    doc.autoTable({
+        startY: 24,
+        head: [['#', 'Herói', 'Classe', 'Dia 1', 'Dia 2', 'Dia 3', 'Dia 4', 'Dia 5', 'Dia 6', 'Dia 7', 'Resumo']],
+        body: rows,
+        headStyles: { fillColor: [41, 28, 19], textColor: [212, 175, 55], fontStyle: 'bold', halign: 'center', fontSize: 8 },
+        bodyStyles: { textColor: [40, 40, 40], fontSize: 8, halign: 'center' },
+        columnStyles: { 0: { cellWidth: 10, halign: 'center' }, 1: { halign: 'left', fontStyle: 'bold' }, 2: { halign: 'left' } },
+        alternateRowStyles: { fillColor: [248, 245, 240] },
+        margin: { horizontal: 14 }
+    });
+
+    const pages = doc.internal.getNumberOfPages();
+    for(let i = 1; i <= pages; i++) {
+        doc.setPage(i); 
+        doc.setFontSize(7.5); 
+        doc.setTextColor(150);
+        doc.text(`Página ${i} de ${pages}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 8, { align: 'center' });
+    }
+
+    doc.save("controle-presenca-guilda-anomalia.pdf");
+}

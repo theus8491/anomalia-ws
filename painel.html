@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Adm - Guilda Anomalia</title>
+    <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF e AutoTable -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <style>
@@ -22,10 +27,10 @@
         <!-- HEADER -->
         <header class="bg-[#1a1410] border-2 border-[#63452c] rounded-2xl p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
-                <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-950/85 text-amber-400 border border-amber-800/50 mb-1"><i class="fa-solid fa-lock-open"></i> Painel Administrativo Completo</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-950/85 text-amber-400 border border-amber-800/50 mb-1"><i class="fa-solid fa-lock-open"></i> Painel Administrativo</span>
                 <h1 class="text-2xl font-black text-amber-100 font-rpg">Gerenciamento - Guilda Anomalia</h1>
             </div>
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-2">
                 <button onclick="carregarMembros()" class="bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] px-3 py-2 rounded-xl text-amber-300 text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-solid fa-rotate"></i> Atualizar</button>
                 <button onclick="gerarPDF()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF Geral</button>
                 <a href="index.html" class="bg-red-950/60 hover:bg-red-900/60 border border-red-800/50 px-3 py-2 rounded-xl text-red-300 text-xs font-bold font-rpg transition flex items-center gap-1"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</a>
@@ -33,20 +38,19 @@
         </header>
 
         <!-- NAVEGAÇÃO DE ABAS -->
-        <div class="flex items-center gap-2 border-b border-[#352214] pb-2 overflow-x-auto">
-            <button onclick="mudarAba('membros')" id="btnTabMembros" class="bg-amber-600 text-stone-950 px-3.5 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-users"></i> Membros</button>
-            <button onclick="mudarAba('pts')" id="btnTabPts" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-3.5 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-people-group"></i> PTs</button>
-            <button onclick="mudarAba('stats')" id="btnTabStats" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-3.5 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-pie"></i> Estatísticas</button>
-            <button onclick="mudarAba('eventos')" id="btnTabEventos" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-3.5 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-calendar-check"></i> Presença</button>
+        <div class="flex flex-wrap items-center gap-2 border-b border-[#352214] pb-2">
+            <button onclick="mudarAba('membros')" id="btnTabMembros" class="bg-amber-600 text-stone-950 px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer shadow-md flex items-center gap-2"><i class="fa-solid fa-users"></i> Membros & Relatório</button>
+            <button onclick="mudarAba('pts')" id="btnTabPts" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2"><i class="fa-solid fa-people-group"></i> Formação de PTs (Até 5)</button>
+            <button onclick="mudarAba('stats')" id="btnTabStats" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> Estatísticas</button>
+            <button onclick="mudarAba('presenca')" id="btnTabPresenca" class="bg-[#130f0d] hover:bg-[#201813] text-amber-300 border border-[#63452c] px-4 py-2 rounded-xl font-rpg font-bold text-xs transition cursor-pointer flex items-center gap-2"><i class="fa-solid fa-calendar-check"></i> Presença</button>
         </div>
 
         <!-- ABA 1: MEMBROS -->
         <div id="tabMembros" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Total Membros</div><div id="totalMembros" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-users text-xl text-amber-600/50"></i></div>
-                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Segunda Facção</div><div id="totalClas" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-shield text-xl text-amber-600/50"></i></div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Total de Membros</div><div id="totalMembros" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-users text-xl text-amber-600/50"></i></div>
+                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Segunda Facção / Tribos</div><div id="totalClas" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-shield text-xl text-amber-600/50"></i></div>
                 <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Proscritos</div><div id="totalProscritos" class="text-xl font-black text-amber-100 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-skull text-xl text-amber-600/50"></i></div>
-                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between cursor-pointer hover:border-amber-600" onclick="filtrarPendencias()"><div><div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Cad. Pendentes</div><div id="totalPendentes" class="text-xl font-black text-amber-300 font-rpg mt-0.5">0</div></div><i class="fa-solid fa-triangle-exclamation text-xl text-amber-600/50"></i></div>
             </div>
 
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl space-y-3">
@@ -93,11 +97,11 @@
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#352214] pb-3">
                     <div>
                         <h2 class="text-base font-bold text-amber-200 font-rpg">Escalação de PTs (Grupos de até 5 Membros)</h2>
-                        <p class="text-xs text-amber-600">Alterne o modo da PT para puxar automaticamente os sets, armas, catacumba e mermem.</p>
+                        <p class="text-xs text-amber-600">Alterne o modo da PT para gerenciar os grupos da guilda.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <button onclick="adicionarPt()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-plus"></i> Nova PT</button>
-                        <button onclick="copiarDiscord()" class="bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] text-amber-300 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-solid fa-copy"></i> Copiar Texto</button>
+                        <button onclick="copiarDiscord()" class="bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] text-amber-300 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-brands fa-discord"></i> Copiar p/ Discord</button>
                         <button onclick="gerarPDFPts()" class="bg-amber-700 hover:bg-amber-600 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF PTs</button>
                     </div>
                 </div>
@@ -107,59 +111,72 @@
 
         <!-- ABA 3: ESTATÍSTICAS -->
         <div id="tabStats" class="space-y-4 hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl gap-3">
-                <div>
-                    <h2 class="text-base font-bold text-amber-200 font-rpg">Relatório Estatístico da Guilda</h2>
-                    <p class="text-xs text-amber-600">Métricas gerais de classes, catacumbas e mermem.</p>
-                </div>
-                <button onclick="gerarPDFStats()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> Baixar PDF Estatísticas</button>
+            <div class="flex justify-end">
+                <button onclick="gerarPDFEstatisticas()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> Baixar PDF de Estatísticas</button>
             </div>
 
-            <!-- CARDS DE TOTAIS CATACUMBA E MERMEM -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl flex items-center justify-between">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between">
                     <div>
-                        <div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Total com Catacumba</div>
-                        <div id="statTotalCatacumba" class="text-2xl font-black text-amber-100 font-rpg mt-0.5">0</div>
+                        <div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Participantes de Catacumba</div>
+                        <div id="statCatacumba" class="text-xl font-black text-emerald-400 font-rpg mt-0.5">0</div>
                     </div>
-                    <div class="w-10 h-10 rounded-xl bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 text-lg"><i class="fa-solid fa-dungeon"></i></div>
+                    <i class="fa-solid fa-dungeon text-xl text-emerald-600/50"></i>
                 </div>
-                <div class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl flex items-center justify-between">
+                <div class="bg-[#1a1410] border border-[#422b17] rounded-xl p-3 flex items-center justify-between">
                     <div>
-                        <div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Total com Mermem</div>
-                        <div id="statTotalMermem" class="text-2xl font-black text-amber-100 font-rpg mt-0.5">0</div>
+                        <div class="text-[11px] uppercase tracking-wider text-amber-500 font-bold">Participantes de Mermem</div>
+                        <div id="statMermem" class="text-xl font-black text-emerald-400 font-rpg mt-0.5">0</div>
                     </div>
-                    <div class="w-10 h-10 rounded-xl bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 text-lg"><i class="fa-solid fa-water"></i></div>
+                    <i class="fa-solid fa-water text-xl text-emerald-600/50"></i>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl space-y-3">
                     <h2 class="text-sm font-bold text-amber-200 font-rpg border-b border-[#352214] pb-2">Distribuição de Classes</h2>
-                    <div class="h-64 flex justify-center"><canvas id="chartClasses"></canvas></div>
+                    <div class="relative h-72 w-full"><canvas id="chartClasses"></canvas></div>
                 </div>
                 <div class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl space-y-3">
                     <h2 class="text-sm font-bold text-amber-200 font-rpg border-b border-[#352214] pb-2">Status de Catacumba e Mermem</h2>
-                    <div class="h-64 flex justify-center"><canvas id="chartCatMermem"></canvas></div>
+                    <div class="relative h-72 w-full"><canvas id="chartParticipacao"></canvas></div>
                 </div>
             </div>
         </div>
 
-        <!-- ABA 4: PRESENÇA / EVENTOS -->
-        <div id="tabEventos" class="space-y-4 hidden">
+        <!-- ABA 4: CONTROLE DE PRESENÇA -->
+        <div id="tabPresenca" class="space-y-4 hidden">
             <div class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-4 shadow-xl space-y-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-[#352214] pb-3">
                     <div>
-                        <h2 class="text-base font-bold text-amber-200 font-rpg">Histórico de Eventos & Chamada</h2>
-                        <p class="text-xs text-amber-600">Registre quais heróis estiveram presentes nos eventos da guilda.</p>
+                        <h2 class="text-base font-bold text-amber-200 font-rpg">Controle de Presença Semanal</h2>
+                        <p class="text-xs text-amber-600">7 slots por membro. Clique no quadrado para alternar: Vazio ➔ OK (Verde) ➔ Falta (Vermelho) ➔ Justificou (Amarelo). Reinicia todo domingo.</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="marcarTodosPresentes()" class="bg-[#130f0d] hover:bg-[#201813] border border-[#63452c] text-amber-300 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-solid fa-check-double"></i> Marcar Todos</button>
-                        <button onclick="novoEvento()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-calendar-plus"></i> Novo Evento</button>
+                        <button onclick="resetarPresenca()" class="bg-red-950/80 hover:bg-red-900 border border-red-800/60 text-red-300 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer flex items-center gap-1"><i class="fa-solid fa-rotate-right"></i> Resetar Semana</button>
+                        <button onclick="gerarPDFPresenca()" class="bg-amber-600 hover:bg-amber-500 text-stone-950 px-3 py-2 rounded-xl text-xs font-bold font-rpg transition cursor-pointer shadow-lg flex items-center gap-1"><i class="fa-solid fa-file-pdf"></i> PDF Presença</button>
                     </div>
                 </div>
-                <div id="listaEventos" class="space-y-3">
-                    <div class="text-center py-10 text-amber-600 italic">Nenhum evento cadastrado. Clique em "Novo Evento".</div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="border-b border-[#352214] text-amber-500 font-rpg">
+                                <th class="p-2.5">Herói</th>
+                                <th class="p-2.5">Classe</th>
+                                <th class="p-2.5 text-center">Dia 1</th>
+                                <th class="p-2.5 text-center">Dia 2</th>
+                                <th class="p-2.5 text-center">Dia 3</th>
+                                <th class="p-2.5 text-center">Dia 4</th>
+                                <th class="p-2.5 text-center">Dia 5</th>
+                                <th class="p-2.5 text-center">Dia 6</th>
+                                <th class="p-2.5 text-center">Dia 7</th>
+                                <th class="p-2.5 text-center">Resumo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaPresencaCorpo" class="divide-y divide-[#291c13]">
+                            <tr><td colspan="10" class="text-center py-6 text-amber-600 italic">Carregando membros...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -168,6 +185,7 @@
     </main>
     <footer class="w-full text-center py-3 text-xs text-amber-700/60 font-rpg tracking-wider">GUILDA ANOMALIA &copy; 2026</footer>
 
- <script src="script-adm.js" defer></script>
+    <!-- SCRIPT EXTERNO -->
+    <script src="script-adm.js"></script>
 </body>
 </html>
