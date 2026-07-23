@@ -204,3 +204,4 @@ document.getElementById('itemForm').addEventListener('submit', async (e) => {
         alert('Erro ao enviar dados para o Supabase: ' + error.message);
     }
 });
+
