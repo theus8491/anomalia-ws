@@ -94,37 +94,48 @@
             </section>
 
             <!-- SEÇÃO III: AMPLIFICAÇÃO DE ARMAS & ESCUDOS -->
-            <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
-                <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">III</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">AMPLIFICAÇÃO DE ARMAS & ESCUDOS (1 A 10 ESTRELAS)</h2></div>
-                <div class="space-y-4">
-                    <script>
-                        const wt = ['Cajado', 'Arco', 'Besta', 'Maça de uma mão', 'Maça de duas mãos', 'Adaga', 'Espada de uma mão', 'Espada de duas mãos', 'Lança', 'Machado de uma mão', 'Machado de duas mãos'];
-                        const wp = [
-                            {id: 'T5', name: 'Arma T5', desc: 'Fúria das Profundezas', kind: 'wf'},
-                            {id: 'Pve', name: 'Arma PvE', desc: 'Equipamento Principal', kind: 'wf'},
-                            {id: 'Map5', name: 'Arma Map 5', desc: 'Calor Exaustivo', kind: 'ld'},
-                            {id: 'Pvp1', name: 'Arma PvP 1', desc: 'Equipamento de Arena', kind: 'wf'},
-                            {id: 'Pvp2', name: 'Arma PvP 2', desc: 'Equipamento de Arena', kind: 'wf'},
-                            {id: 'ShieldPve', name: 'Escudo PvE', desc: 'Equipamento Principal', kind: 'ld'},
-                            {id: 'ShieldPvp', name: 'Escudo PvP', desc: 'Equipamento de Arena', kind: 'ld'}
-                        ];
-                        wp.forEach(w => {
-                            let hc = w.kind === 'wf' ? `
-                                <div class="space-y-1.5 flex-1 pr-2">
-                                    <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600"><option value="Nível 30">Nível 30</option><option value="Nível 33">Nível 33</option></select></div>
-                                    <select id="type${w.id}" class="w-full bg-[#110e0c] border border-[#422b17] rounded-lg px-2.5 py-1 text-xs text-amber-200 focus:outline-none focus:border-amber-600 font-medium"><option value="" disabled selected>Selecione o tipo de arma</option>${wt.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
-                                </div>` : `
-                                <div class="space-y-1.5 flex-1 pr-2">
-                                    <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600"><option value="Nível 30">Nível 30</option><option value="Nível 33">Nível 33</option></select></div>
-                                    <div class="text-xs text-amber-600 font-medium">${w.desc}</div>
-                                </div>`;
-                            let so = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
-                            for(let i=1; i<=10; i++) so += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
-                            document.write(`<div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3"><div class="flex items-center justify-between gap-2">${hc}<div class="flex items-center gap-3 shrink-0"><label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${w.id}" class="custom-checkbox"> Não tenho</label><label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${w.id}" class="custom-checkbox"> Equipado</label></div></div><select id="amp${w.id}" onchange="updateStars('amp${w.id}', 'stars${w.id}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${so}</select><div id="stars${w.id}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div></div>`);
-                        });
-                    </script>
-                </div>
-            </section>
+       <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
+    <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-[#352214]"><span class="w-7 h-7 rounded-lg bg-[#291c13] border border-[#63452c] flex items-center justify-center text-amber-400 font-rpg text-xs font-bold">III</span><h2 class="text-base sm:text-lg font-bold text-amber-200 font-rpg tracking-wide">AMPLIFICAÇÃO DE ARMAS & ESCUDOS (1 A 10 ESTRELAS)</h2></div>
+    <div class="space-y-4">
+        <script>
+            const wt = ['Cajado', 'Arco', 'Besta', 'Maça de uma mão', 'Maça de duas mãos', 'Adaga', 'Espada de uma mão', 'Espada de duas mãos', 'Lança', 'Machado de uma mão', 'Machado de duas mãos'];
+            const wp = [
+                {id: 'T5', name: 'Arma T5', desc: 'Fúria das Profundezas', kind: 'wf'},
+                {id: 'Pve', name: 'Arma PvE', desc: 'Equipamento Principal', kind: 'wf'},
+                {id: 'Map5', name: 'Arma Map 5', desc: 'Calor Exaustivo', kind: 'ld'},
+                {id: 'Pvp1', name: 'Arma PvP 1', desc: 'Equipamento de Arena', kind: 'wf'},
+                {id: 'Pvp2', name: 'Arma PvP 2', desc: 'Equipamento de Arena', kind: 'wf'},
+                {id: 'ShieldPve', name: 'Escudo PvE', desc: 'Equipamento Principal', kind: 'ld'},
+                {id: 'ShieldPvp', name: 'Escudo PvP', desc: 'Equipamento de Arena', kind: 'ld'}
+            ];
+            wp.forEach(w => {
+                let optionsLevel = '';
+                if (['T5', 'Pvp1', 'Pvp2', 'ShieldPvp'].includes(w.id)) {
+                    optionsLevel = '<option value="Nível 30">Nível 30</option><option value="Nível 33">Nível 33</option>';
+                } else if (['Pve', 'ShieldPve'].includes(w.id)) {
+                    optionsLevel = '<option value="Nível 32">Nível 32</option><option value="Nível 34">Nível 34</option>';
+                } else if (w.id === 'Map5') {
+                    optionsLevel = '<option value="Nível 33">Nível 33</option>';
+                } else {
+                    optionsLevel = '<option value="Nível 30">Nível 30</option><option value="Nível 34">Nível 34</option>';
+                }
+
+                let hc = w.kind === 'wf' ? `
+                    <div class="space-y-1.5 flex-1 pr-2">
+                        <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600">${optionsLevel}</select></div>
+                        <select id="type${w.id}" class="w-full bg-[#110e0c] border border-[#422b17] rounded-lg px-2.5 py-1 text-xs text-amber-200 focus:outline-none focus:border-amber-600 font-medium"><option value="" disabled selected>Selecione o tipo de arma</option>${wt.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+                    </div>` : `
+                    <div class="space-y-1.5 flex-1 pr-2">
+                        <div class="flex items-center justify-between"><span class="text-sm font-bold text-amber-100 font-rpg">${w.name}</span><select id="level${w.id}" class="bg-[#110e0c] border border-[#422b17] rounded-lg px-2 py-0.5 text-[11px] text-amber-300 font-semibold focus:outline-none focus:border-amber-600">${optionsLevel}</select></div>
+                        <div class="text-xs text-amber-600 font-medium">${w.desc}</div>
+                    </div>`;
+                let so = '<option value="+0 (Sem amp)">+0 (Sem amp)</option>';
+                for(let i=1; i<=10; i++) so += `<option value="+${i} Estrela${i>1?'s':''}">+${i} Estrela${i>1?'s':''}</option>`;
+                document.write(`<div class="bg-[#130f0d] border border-[#302015] rounded-xl p-4 space-y-3"><div class="flex items-center justify-between gap-2">${hc}<div class="flex items-center gap-3 shrink-0"><label class="flex items-center gap-1.5 text-xs text-red-400 cursor-pointer"><input type="checkbox" id="no${w.id}" class="custom-checkbox"> Não tenho</label><label class="flex items-center gap-1.5 text-xs text-amber-500 cursor-pointer"><input type="checkbox" id="check${w.id}" class="custom-checkbox"> Equipado</label></div></div><select id="amp${w.id}" onchange="updateStars('amp${w.id}', 'stars${w.id}')" class="w-full bg-[#1a1410] border border-[#422b17] rounded-lg px-3 py-1.5 text-xs text-amber-200 focus:outline-none focus:border-amber-600">${so}</select><div id="stars${w.id}" class="text-amber-700/40 text-xs tracking-widest text-center">★★★★★★★★★★</div></div>`);
+            });
+        </script>
+    </div>
+</section>
 
             <!-- SEÇÃO IV: ACESSÓRIOS PvP & AMPLIFICAÇÃO -->
             <section class="bg-[#1a1410] border border-[#422b17] rounded-2xl p-5 sm:p-6 shadow-xl">
